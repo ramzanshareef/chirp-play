@@ -16,6 +16,7 @@
         "mongoose": "^8.4.1",
         "next": "canary",
         "next-cloudinary": "^6.6.2",
+        "nextjs-toploader": "^1.6.12",
         "react": "canary",
         "react-dom": "canary",
         "react-icons": "^5.2.1",

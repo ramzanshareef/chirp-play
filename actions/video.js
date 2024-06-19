@@ -1,8 +1,7 @@
 "use server";
 
 import connectDB from "@root/actions/db/connectDB";
-import Video from "@root/models/Video.model";
-import { unstable_noStore } from "next/cache";
+import Video from "@root/models/Video";
 
 export const getAllVideoes = async () => {
     try {
@@ -10,7 +9,7 @@ export const getAllVideoes = async () => {
         const videos = await Video.find({}).populate("owner", "name username avatar coverImage");
         return {
             status: 200,
-            videos: JSON.parse(JSON.stringify([...videos]))
+            videos: JSON.parse(JSON.stringify(videos))
         };
     }
     catch (error) {
@@ -19,7 +18,6 @@ export const getAllVideoes = async () => {
 };
 
 export const getVideo = async (videoId) => {
-    unstable_noStore();
     try {
         await connectDB();
         const video = await Video.findById(videoId).populate("owner", "name username avatar coverImage");

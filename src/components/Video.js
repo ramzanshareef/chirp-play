@@ -6,20 +6,18 @@ import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { formatTime } from "@root/utils/time";
-import { useRouter } from "next/navigation";
 
 export const VideoComp = ({ video }) => {
-    const router = useRouter();
     return (
         <>
-            <Link className="max-w-sm rounded overflow-hidden shadow-lg hover:cursor-pointer hover:scale-[1.03] transition-transform duration-300 ease-in-out"
+            <Link className="max-w-sm rounded overflow-hidden shadow-lg hover:cursor-pointer"
                 href={`/video/${video._id}`}
             >
                 <div className="relative">
                     <CldImage
                         className="w-full h-48 object-cover"
                         src={video.thumbnail}
-                        alt="Video Thumbnail"
+                        alt={video.title}
                         key={video._id}
                         id={video._id}
                         width={1920}

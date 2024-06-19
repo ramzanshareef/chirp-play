@@ -1,11 +1,14 @@
 /* eslint-disable no-unused-vars */
 "use server";
 
-import Video from "@root/models/Video.model";
+import Video from "@root/models/Video";
 import connectDB from "../db/connectDB";
 import { getUserData } from "./data";
 import { v2 as Cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
+import mongoose from "mongoose";
+import Like from "@root/models/Like";
+import Subscription from "@root/models/Subscription";
 
 Cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -95,10 +98,93 @@ export async function getUserVideos() {
         if (userData.status !== 200) {
             return { status: 401, message: "Unauthorized" };
         }
-        let videos = await Video.find({ owner: userData.user._id });
+        let videos = await Video.aggregate([
+            {
+                $match: {
+                    owner: new mongoose.Types.ObjectId(userData.user._id),
+                },
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "contentID",
+                    as: "likes",
+                },
+            },
+            {
+                $project: {
+                    title: 1,
+                    description: 1,
+                    thumbnail: 1,
+                    views: 1,
+                    createdAt: 1,
+                    duration: 1,
+                    likes: { $size: "$likes" },
+                },
+            },
+        ]);
         return {
             status: 200,
             videos: JSON.parse(JSON.stringify(videos))
+        };
+    }
+    catch (err) {
+        return { status: 500, message: "Internal server error" + err.message };
+    }
+}
+
+export async function totalStatsofUser() {
+    try {
+        await connectDB();
+        let userData = await getUserData();
+        if (userData.status !== 200) {
+            return { status: 401, message: "Unauthorized" };
+        }
+        const totalViews = await Video.aggregate([
+            {
+                $match: {
+                    owner: new mongoose.Types.ObjectId(userData.user._id),
+                },
+            },
+            {
+                $group: {
+                    _id: "$owner",
+                    totalViews: { $sum: "$views" },
+                },
+            },
+        ]);
+        const totalLikes = await Like.aggregate([
+            {
+                $match: {
+                    likedBy: new mongoose.Types.ObjectId(userData.user._id),
+                },
+            },
+            {
+                $group: {
+                    _id: "$likedBy",
+                    totalLikes: { $sum: 1 },
+                },
+            },
+        ]);
+        const totalSubscribers = await Subscription.aggregate([
+            {
+                $match: {
+                    channel: new mongoose.Types.ObjectId(userData.user._id),
+                },
+            },
+            {
+                $group: {
+                    _id: "$channel",
+                    totalSubscribers: { $sum: 1 },
+                },
+            },
+        ]);
+        return {
+            status: 200,
+            totalViews: totalViews[0]?.totalViews || 0,
+            totalLikes: totalLikes[0]?.totalLikes || 0,
+            totalSubscribers: totalSubscribers[0]?.totalSubscribers || 0,
         };
     }
     catch (err) {

@@ -7,7 +7,7 @@ import { IoSearchSharp, IoCloseSharp } from "react-icons/io5";
 import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import { IoMdSearch } from "react-icons/io";
-import PropTypes from "prop-types";
+import Link from "next/link";
 
 const Header = ({ userData }) => {
     const router = useRouter();
@@ -21,7 +21,8 @@ const Header = ({ userData }) => {
             >
                 <div className="flex items-center gap-x-4">
                     <Image src="/navbar.svg" alt="Sidebar" width={24} height={24} className="hidden sm:block cursor-pointer hover:opacity-75" />
-                    <Image src="/logo.png" title="Chirp Play" alt="Chirp Play" width={70} height={70} className="cursor-pointer h-12 w-16" onClick={() => router.replace("/")} />
+                    <Link href="/">
+                        <Image src="/logo.png" title="Chirp Play" alt="Chirp Play" width={70} height={70} className="cursor-pointer h-12 w-16" /> </Link>
                 </div>
                 <div className="rounded-full border border-gray-500 hidden items-center px-3 py-2 w-2/5 sm:flex">
                     <div className="flex flex-row-reverse items-center w-full relative">
@@ -72,7 +73,7 @@ const Header = ({ userData }) => {
                         onClick={() => router.push("/login")}
                     >
                         {userData.user ? <div className="flex gap-2">
-                            <Image src={userData.user?.avatar} alt="User" width={24} height={24} className="rounded-full" />
+                            <Image src={userData.user?.avatar} alt={userData.user.name} width={24} height={24} className="rounded-full" />
                             <p className="hidden sm:block">{userData.user.username}</p>
                         </div> :
                             <>
@@ -106,7 +107,3 @@ const Header = ({ userData }) => {
     );
 };
 export default Header;
-
-Header.propTypes = {
-    userData: PropTypes.object.isRequired,
-};

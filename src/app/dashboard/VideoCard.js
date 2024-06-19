@@ -44,7 +44,7 @@ export const VideoCard = ({ key, video }) => {
                                         </path>
                                     </svg>
                                     <p>
-                                        1.2k Likes
+                                        {video.likes?.toLocaleString("en-IN")} Likes
                                     </p>
                                 </div>
                                 <div className="flex items-center">

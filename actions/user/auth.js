@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@root/utils/session";
-import User from "@root/models/User.model";
+import User from "@root/models/User";
 import connectDB from "@root/actions/db/connectDB";
 
 const bcryptjs = require("bcryptjs");
@@ -71,7 +71,6 @@ export async function userLogin(currentState, formData) {
                         email: user.email
                     };
                     await session.save();
-                    console.log("Congratulations, you are logged in");
                     return { status: 200, message: "Login successful" };
                 }
                 else {

@@ -132,7 +132,7 @@ function Modal1({ videoURL, setVideoURL, videoLength, setVideoLength }) {
                                             src={videoURL}
                                             className="rounded-md w-60 h-40"
                                             logo={false}
-                                            alt="Description of my image"
+                                            alt="Description of my video"
                                         />
                                         <p>
                                             Video uploaded successfully, Please continue to the next step

@@ -1,7 +1,7 @@
 "use server";
 
 import connectDB from "@root/actions/db/connectDB";
-import User from "@root/models/User.model";
+import User from "@root/models/User";
 import { getSession } from "@root/utils/session";
 
 export const getUserData = async () => {

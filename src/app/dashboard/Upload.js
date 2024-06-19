@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { VideoUploadModal } from "../modals/videoUpload";
+import { VideoUploadModal } from "@/components/modals/videoUpload";
 import { FaPlus } from "react-icons/fa";
 
 const Upload = () => {

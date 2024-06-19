@@ -8,8 +8,7 @@ export default async function connectDB() {
             .then((connectionInstance) => {
                 console.log(`\n MongoDB Connected, DB HOST = ${connectionInstance.connections[0].host}`);
             })
-            .catch((err) => {
-                console.log("DB Connection Error = ", err.message);
+            .catch(() => {
                 process.exit(1);
             });
     }

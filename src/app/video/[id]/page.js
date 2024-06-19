@@ -78,7 +78,7 @@ export default async function VideoPage({ params }) {
                             (<div className="flex flex-row gap-x-4">
                                 <Image
                                     src="https://res.cloudinary.com/cloudformedia/image/upload/chirp-play/avatar-default.jpg"
-                                    alt="User Avatar"
+                                    alt={userDetails?.data?.name}
                                     className="w-10 h-10 rounded-full"
                                     width={40}
                                     height={40}

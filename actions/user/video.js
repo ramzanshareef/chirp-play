@@ -5,6 +5,7 @@ import Video from "@root/models/Video.model";
 import connectDB from "../db/connectDB";
 import { getUserData } from "./data";
 import { v2 as Cloudinary } from "cloudinary";
+import { revalidatePath } from "next/cache";
 
 Cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -17,6 +18,7 @@ export async function videoUpload(currentState, formData) {
     let thumbnail = formData.get("thumbnailURL");
     let title = formData.get("title");
     let description = formData.get("description");
+    let videoLength = formData.get("videoLength");
     if (videoFile.length === 0 || title.length === 0 || description.length === 0 || thumbnail.length === 0) {
         return { status: 400, message: "All fields are required" };
     }
@@ -32,8 +34,10 @@ export async function videoUpload(currentState, formData) {
                 videoFile,
                 thumbnail,
                 title,
-                description
+                description,
+                duration: parseInt(videoLength)
             });
+            revalidatePath("/dashboard");
             return { status: 200, message: "Video uploaded successfully" };
         }
         catch (err) {
@@ -78,6 +82,24 @@ export async function cancelledModalVideoDelete(thumbnailURL, videoURL) {
         else {
             return { status: 200, message: "Deleted Successfully!" };
         }
+    }
+    catch (err) {
+        return { status: 500, message: "Internal server error" + err.message };
+    }
+}
+
+export async function getUserVideos() {
+    try {
+        await connectDB();
+        let userData = await getUserData();
+        if (userData.status !== 200) {
+            return { status: 401, message: "Unauthorized" };
+        }
+        let videos = await Video.find({ owner: userData.user._id });
+        return {
+            status: 200,
+            videos: JSON.parse(JSON.stringify(videos))
+        };
     }
     catch (err) {
         return { status: 500, message: "Internal server error" + err.message };

@@ -14,16 +14,21 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
     const [currModal, setCurrModal] = useState(1);
     const [videoURL, setVideoURL] = useState("");
     const [thumbnailURL, setThumbnailURL] = useState("");
+    const [videoLength, setVideoLength] = useState(0);
     const modalsMap = {
         1: <Modal1
             videoURL={videoURL}
             setVideoURL={setVideoURL}
+            videoLength={videoLength}
+            setVideoLength={setVideoLength}
         />,
         2: <Modal2
             thumbnailURL={thumbnailURL}
             setThumbnailURL={setThumbnailURL}
             videoURL={videoURL}
             setVideoURL={setVideoURL}
+            videoLength={videoLength}
+            setVideoLength={setVideoLength}
             onClose={() => {
                 onClose();
                 setCurrModal(1);
@@ -90,7 +95,7 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
     );
 };
 
-function Modal1({ videoURL, setVideoURL }) {
+function Modal1({ videoURL, setVideoURL, videoLength, setVideoLength }) {
     return (
         <>
             <h2 className="text-2xl font-semibold mb-4">Upload your Video</h2>
@@ -112,7 +117,9 @@ function Modal1({ videoURL, setVideoURL }) {
                     }}
                     onSuccess={(response) => {
                         setVideoURL(response.info.secure_url);
+                        setVideoLength(response.info.duration);
                     }}
+                    
                 >
                     {({ open }) => {
                         return (
@@ -152,7 +159,7 @@ function Modal1({ videoURL, setVideoURL }) {
     );
 };
 
-function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, onClose }) {
+function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, videoLength, setVideoLength, onClose }) {
     const [state, submitAction] = useActionState(videoUpload, null);
 
     useEffect(() => {
@@ -162,6 +169,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, onClose 
                     document.getElementById("videoUploadForm").reset();
                     setThumbnailURL("");
                     setVideoURL("");
+                    setVideoLength(0);
                     onClose();
                 },
             });
@@ -169,7 +177,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, onClose 
         else if (state?.status !== 200) {
             toast.error(state?.message);
         }
-    }, [setThumbnailURL, setVideoURL, state, onClose]);
+    }, [setThumbnailURL, setVideoURL, state, onClose, setVideoLength]);
 
     return (
         <>
@@ -193,6 +201,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, onClose 
                         }}
                         onSuccess={(response) => {
                             setThumbnailURL(response.info.secure_url);
+
                         }}
                     >
                         {({ open }) => {
@@ -238,6 +247,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, onClose 
                         </div>
                         <input type="text" name="videoURL" id="videoURL" value={videoURL} required hidden />
                         <input type="text" name="thumbnailURL" id="thumbnailURL" value={thumbnailURL} required hidden />
+                        <input type="text" name="videoLength" id="videoLength" value={videoLength} required hidden />
                         <SubmitButton title="Publish Video" size="fit" />
                     </form>
                 </div>

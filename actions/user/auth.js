@@ -40,7 +40,7 @@ export async function userSignup(currentState, formData) {
             }
         }
         catch (err) {
-            return { status: 500, message: "Internal server error" + err.message };
+            return { status: 500, message: "Internal Server Error " + err.message };
         }
     }
 }
@@ -82,7 +82,7 @@ export async function userLogin(currentState, formData) {
             }
         }
         catch (err) {
-            return { status: 500, message: "Internal server error" + err.message };
+            return { status: 500, message: "Internal Server Error " + err.message };
         }
     }
 }
@@ -93,6 +93,6 @@ export async function userLogout() {
         return { status: 200, message: "Logged out" };
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" };
+        return { status: 500, message: "Internal Server Error " };
     }
 }

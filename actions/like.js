@@ -10,7 +10,7 @@ export async function likeHandler(contentID, contentType) {
         await connectDB();
         let userData = await getUserData();
         if (userData.status !== 200) {
-            return { status: 401, message: "Please login to subscribe" };
+            return { status: 401, message: "Please login to Like" };
         }
         let like = await Like.findOne({
             contentID: contentID,
@@ -37,7 +37,7 @@ export async function likeHandler(contentID, contentType) {
         return { status: 200, message: "Liked successfully 🙂" };
     }
     catch (error) {
-        return { status: 500, message: "Internal Server Error" + error.message };
+        return { status: 500, message: "Internal Server Error " + error.message };
     }
 }
 
@@ -55,7 +55,7 @@ export async function likeStatus(contentID) {
         return { status: 200, isLiked: like ? true : false };
     }
     catch (error) {
-        return { status: 500, message: "Internal Server Error" + error.message };
+        return { status: 500, message: "Internal Server Error " + error.message };
     }
 }
 
@@ -66,6 +66,6 @@ export async function getLikes(contentID) {
         return { status: 200, totalLikes: totalLikes };
     }
     catch (error) {
-        return { status: 500, message: "Internal Server Error" + error.message };
+        return { status: 500, message: "Internal Server Error " + error.message };
     }
 }

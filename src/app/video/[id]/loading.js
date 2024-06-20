@@ -36,7 +36,8 @@ const loading = () => {
                                     </div>
                                 </div>
                                 <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 sm:ml-4 p-2 flex items-center gap-x-2 ml-auto"
+                                    className="sm:ml-4 items-center gap-x-2 ml-auto flex justify-center rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:focus-visible:outline-gray-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2"
                                 >
                                     <FaRegBell size={20} />
                                     <span className="hidden sm:block">
@@ -46,12 +47,14 @@ const loading = () => {
                             </div>
                             <div className="flex">
                                 <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 mr-2 p-2 flex items-center gap-x-2"
+                                    className="items-center gap-x-2 flex justify-center rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:focus-visible:outline-gray-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2 ml-auto mr-2"
                                 >
-                                    <AiOutlineLike size={20} /> 
+                                    <AiOutlineLike size={20} />
                                 </button>
                                 <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 p-2"
+                                    className="items-center gap-x-2 flex justify-center rounded-md bg-gray-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:focus-visible:outline-gray-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2"
                                 >
                                     <MdPlaylistAdd size={20} />
                                 </button>
@@ -61,7 +64,7 @@ const loading = () => {
                             <div className="animate-pulse bg-gray-200 h-4 w-full rounded-lg mb-2"></div>
                         </div>
                     </div>
-                    
+
                     {/* comments */}
                     <div className="flex flex-col gap-y-4 p-4">
                         <div className="flex flex-row gap-x-4">

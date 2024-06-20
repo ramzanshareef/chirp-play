@@ -28,6 +28,12 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Please provide a username"],
         unique: true,
         trim: true,
+        validate: {
+            validator: function (v) {
+                return /^[a-zA-Z0-9_.-]*$/.test(v);
+            },
+            message: (props) => `${props.value} is not a valid username. Only letters, numbers, underscores, periods, and hyphens are allowed.`,
+        },
     },
     avatar: {
         type: String,

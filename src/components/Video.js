@@ -6,6 +6,8 @@ import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import { formatTime } from "@root/utils/time";
+import { increaseVideoView } from "@root/actions/video";
+import { useEffect, useRef, useState } from "react";
 
 export const VideoComp = ({ video }) => {
     return (
@@ -47,6 +49,53 @@ export const VideoComp = ({ video }) => {
 };
 
 export const VideoPlayer = ({ video }) => {
+    const videoRef = useRef(null);
+    const [viewedSegments, setViewedSegments] = useState(new Set());
+    const [viewCounted, setViewCounted] = useState(false);
+
+    const hasWatched40Percent = (segments, duration) => {
+        const uniqueSegments = Array.from(segments).sort((a, b) => a - b);
+        const requiredWatchTime = duration * 0.4;
+        let totalWatchedTime = 0;
+        let lastTime = null;
+
+        for (let time of uniqueSegments) {
+            if (lastTime !== null && time - lastTime > 1) {
+                totalWatchedTime = 0;
+            }
+            totalWatchedTime += 1;
+            lastTime = time;
+            if (totalWatchedTime >= requiredWatchTime) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    useEffect(() => {
+        const video = videoRef.current;
+        const handleTimeUpdate = () => {
+            const currentTime = Math.floor(video.currentTime);
+            const duration = video.duration;
+            setViewedSegments((prevSegments) => new Set([...prevSegments, currentTime]));
+            if (!viewCounted && hasWatched40Percent(viewedSegments, duration)) {
+                setViewCounted(true);
+            }
+        };
+        video.addEventListener("timeupdate", handleTimeUpdate);
+        return () => {
+            video.removeEventListener("timeupdate", handleTimeUpdate);
+        };
+    }, [viewedSegments, viewCounted]);
+
+    useEffect(() => {
+        if (viewCounted) {
+            (async () => {
+                await increaseVideoView(video._id);
+            })();
+        }
+    }, [viewCounted, video._id]);
+
     return (
         <>
             <CldVideoPlayer
@@ -54,7 +103,7 @@ export const VideoPlayer = ({ video }) => {
                 className="rounded-lg p-6"
                 controls
                 poster={video.thumbnail}
-                id={video._id}
+                id={"video-" + video._id}
                 width={1920}
                 height={1080}
                 logo={{
@@ -67,6 +116,7 @@ export const VideoPlayer = ({ video }) => {
                 aiHighlightsGraph={true}
                 playedEventPercents={[25, 50, 75, 100]}
                 showJumpControls={true}
+                videoRef={videoRef}
             />
         </>
     );

@@ -43,7 +43,7 @@ export async function videoUpload(currentState, formData) {
             return { status: 200, message: "Video uploaded successfully" };
         }
         catch (err) {
-            return { status: 500, message: "Internal server error" + err.message };
+            return { status: 500, message: "Internal Server Error " + err.message };
         }
     }
 }
@@ -54,7 +54,7 @@ export async function cancelledModalVideoDelete(thumbnailURL, videoURL) {
             return new Promise((resolve, reject) => {
                 Cloudinary.api.delete_resources(["chirp-play/" + videoURL.split("/").pop().split(".")[0]], { resource_type: "video" }, (error, result) => {
                     if (error) {
-                        reject({ status: 500, message: "Internal server error" });
+                        reject({ status: 500, message: "Internal Server Error " });
                     }
                     else {
                         resolve({ status: 200, message: "Video deleted successfully" });
@@ -66,12 +66,12 @@ export async function cancelledModalVideoDelete(thumbnailURL, videoURL) {
             return new Promise((resolve, reject) => {
                 Cloudinary.api.delete_resources(["chirp-play/" + thumbnailURL.split("/").pop().split(".")[0]], { resource_type: "image" }, (error, result) => {
                     if (error) {
-                        reject({ status: 500, message: "Internal server error" });
+                        reject({ status: 500, message: "Internal Server Error " });
                     }
                     else {
                         Cloudinary.api.delete_resources(["chirp-play/" + videoURL.split("/").pop().split(".")[0]], { resource_type: "video" }, (error, result) => {
                             if (error) {
-                                reject({ status: 500, message: "Internal server error" });
+                                reject({ status: 500, message: "Internal Server Error " });
                             }
                             else {
                                 resolve({ status: 200, message: "Image and video deleted successfully" });
@@ -86,7 +86,7 @@ export async function cancelledModalVideoDelete(thumbnailURL, videoURL) {
         }
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 }
 
@@ -129,7 +129,7 @@ export async function getUserVideos() {
         };
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 }
 
@@ -200,6 +200,6 @@ export async function totalStatsofUser() {
         };
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 }

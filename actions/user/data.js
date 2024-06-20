@@ -21,6 +21,6 @@ export const getUserData = async () => {
         }
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 };

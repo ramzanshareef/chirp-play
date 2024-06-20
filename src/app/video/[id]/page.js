@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { VideoComp } from "@/components/Video";
 import { getUserData } from "@root/actions/user/data";
-import { getVideo, increaseVideoView, suggestedVideos } from "@root/actions/video";
+import { getVideo, suggestedVideos } from "@root/actions/video";
 import moment from "moment";
 import Image from "next/image";
 import { AiOutlineLike } from "react-icons/ai";
 import { FaRegBell } from "react-icons/fa";
 import { MdPlaylistAdd, MdPlaylistAddCheck } from "react-icons/md";
-import Comments from "./Comments";
+import { Comments, CommentsForm } from "./Comments";
 import { Suspense } from "react";
 import { VideoPlayerComponent } from "./VideoPlayer";
 import { LikeButton, SubscribeButton } from "./ClientComponents";
@@ -16,10 +16,9 @@ import { getLikes } from "@root/actions/like";
 
 export default async function VideoPage({ params }) {
     const userDetails = await getUserData();
-    const { video } = await getVideo(params.id);
+    const { video, comments } = await getVideo(params.id);
     const { totalSubscribers } = await getSubscribers(video.owner._id);
     const { totalLikes } = await getLikes(video._id);
-    await increaseVideoView(params.id);
     const suggestedVideosData = await suggestedVideos(params.id);
     return (
         <>
@@ -28,10 +27,7 @@ export default async function VideoPage({ params }) {
 
                     {/* video player */}
                     <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg"></div>}>
-                        {/* <VideoPlayerComponent videoID={params?.id} /> */}
-                        <div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg">
-                            This is a video player placeholder, to be replaced with a real video player.
-                        </div>
+                        <VideoPlayerComponent videoID={params?.id} />
                     </Suspense>
 
                     {/* video details */}
@@ -65,7 +61,8 @@ export default async function VideoPage({ params }) {
                                     totalLikes={totalLikes}
                                 />
                                 <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 p-2"
+                                    className="items-center gap-x-2 flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-indigo-400 disabled:hover:bg-indigo-400 disabled:focus-visible:outline-indigo-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2"
                                 >
                                     <MdPlaylistAdd size={20} />
                                     {/* <MdPlaylistAddCheck size={20} /> */}
@@ -82,23 +79,15 @@ export default async function VideoPage({ params }) {
                         {userDetails?.status === 200 ?
                             (<div className="flex flex-row gap-x-4">
                                 <Image
-                                    src="https://res.cloudinary.com/cloudformedia/image/upload/chirp-play/avatar-default.jpg"
-                                    alt={userDetails?.data?.name}
+                                    src={userDetails?.user?.avatar}
+                                    alt={userDetails?.user?.name}
                                     className="w-10 h-10 rounded-full"
                                     width={40}
                                     height={40}
                                 />
-                                <div className="flex flex-col w-full">
-                                    <textarea
-                                        className="w-full p-2 border border-gray-200 rounded-lg"
-                                        placeholder="Add a public comment..."
-                                    />
-                                    <button
-                                        className="bg-indigo-400 hover:bg-indigo-500 text-white p-2 mt-2 ml-auto"
-                                    >
-                                        Comment
-                                    </button>
-                                </div>
+                                <CommentsForm
+                                    videoID={video._id}
+                                />
                             </div>) : (
                                 <div className="flex flex-row gap-x-4">
                                     <Image
@@ -119,7 +108,11 @@ export default async function VideoPage({ params }) {
                                 </div>
                             )}
 
-                        <Comments />
+                        {/* Existing Comments */}
+                        <Comments
+                            comments={comments}
+                            username={userDetails?.user?.username}
+                        />
                     </div>
                 </div>
 

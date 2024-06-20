@@ -11,7 +11,7 @@ export async function subscribeHandlerToChannel(channelID, videoID) {
         await connectDB();
         let userData = await getUserData();
         if (userData.status !== 200) {
-            return { status: 401, message: "Please login to subscribe" };
+            return { status: 401, message: "Please login to Subscribe" };
         }
         if (userData.user._id.toString() === channelID) {
             return { status: 400, message: "You can't subscribe to your own channel 😅" };
@@ -38,7 +38,7 @@ export async function subscribeHandlerToChannel(channelID, videoID) {
         return { status: 200, message: "Subscribed successfully 🙂" };
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 }
 
@@ -56,7 +56,7 @@ export async function subscriptionStatus(channelID) {
         return { status: 200, isSubscribed: subscription ? true : false };
     }
     catch (err) {
-        return { status: 500, message: "Internal server error" + err.message };
+        return { status: 500, message: "Internal Server Error " + err.message };
     }
 }
 

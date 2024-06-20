@@ -95,7 +95,7 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
     );
 };
 
-function Modal1({ videoURL, setVideoURL, videoLength, setVideoLength }) {
+function Modal1({ videoURL, setVideoURL, setVideoLength }) {
     return (
         <>
             <h2 className="text-2xl font-semibold mb-4">Upload your Video</h2>

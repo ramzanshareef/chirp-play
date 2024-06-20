@@ -22,7 +22,8 @@ export const SubscribeButton = ({ channelID, videoID }) => {
     return (
         <>
             <button
-                className="sm:ml-4 p-2 px-4 flex items-center gap-x-2 ml-auto bg-indigo-400 hover:bg-indigo-500 text-white rounded-3xl"
+                className="sm:ml-4 items-center gap-x-2 ml-auto flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-indigo-400 disabled:hover:bg-indigo-400 disabled:focus-visible:outline-indigo-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2"
                 onClick={async (e) => {
                     e.preventDefault();
                     let res = await subscribeHandlerToChannel(channelID, videoID);
@@ -72,7 +73,8 @@ export const LikeButton = ({ videoID, totalLikes }) => {
     return (
         <>
             <button
-                className="sm:ml-4 p-2 flex items-center gap-x-2 ml-auto bg-indigo-400 hover:bg-indigo-500 rounded mr-2"
+                className="items-center gap-x-2 flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+                disabled:cursor-not-allowed disabled:shadow-none disabled:bg-indigo-400 disabled:hover:bg-indigo-400 disabled:focus-visible:outline-indigo-400 disabled:focus-visible:outline-offset-0 disabled:focus-visible:outline-2 ml-auto mr-2"
                 onClick={async (e) => {
                     e.preventDefault();
                     let res = await likeHandler(videoID, "Video");
@@ -84,8 +86,6 @@ export const LikeButton = ({ videoID, totalLikes }) => {
                     }
                     else {
                         toast.error(res.message, {
-                            onClick: setLikerStatus(!likerStatus),
-                            onClose: setLikerStatus(!likerStatus),
                         });
                     }
                 }}

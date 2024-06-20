@@ -22,7 +22,7 @@ const LoginForm = () => {
         else if (state?.status === 200) {
             toast.success(state?.message, {
                 onClose: () => {
-                    router.push("/dashboard");
+                    router.push("/");
                 },
             });
         }

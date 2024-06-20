@@ -6,11 +6,8 @@ import { FcCalendar } from "react-icons/fc";
 import { FaRegEdit } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
-import { useState } from "react";
 
 export const VideoCard = ({ key, video }) => {
-    const [showModal, setShowModal] = useState(false);
-
     return (
         <>
             <div className="flex flex-col justify-center">
@@ -24,9 +21,6 @@ export const VideoCard = ({ key, video }) => {
                             width="1920"
                             height="1080"
                             className="rounded-lg cursor-pointer"
-                            onClick={() => {
-                                setShowModal(true);
-                            }}
                         />
                     </div>
                     <div className="w-full md:w-2/3 flex flex-col space-y-2 py-3 sm:py-0 px-0 sm:px-3  justify-between">
@@ -70,22 +64,6 @@ export const VideoCard = ({ key, video }) => {
                     </div>
                 </div>
             </div>
-
-            {showModal && (
-                <div className="fixed top-0 left-0 z-max w-screen min-h-screen bg-black/80 flex justify-center items-center">
-                    <button className="fixed z-90 top-20 right-8 text-white dark:text-slate-200 text-5xl font-bold" onClick={() => setShowModal(false)} >
-                        &times;
-                    </button>
-                    <div>
-                        <video src={video.videoFile}
-                            controls
-                            className="z-max"
-                            width="800"
-                            height="600"
-                        ></video>
-                    </div>
-                </div>
-            )}
         </>
     );
 };

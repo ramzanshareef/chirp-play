@@ -7,7 +7,6 @@ import { getUserData } from "./data";
 import { v2 as Cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
-import Like from "@root/models/Like";
 import Subscription from "@root/models/Subscription";
 
 Cloudinary.config({
@@ -154,16 +153,29 @@ export async function totalStatsofUser() {
                 },
             },
         ]);
-        const totalLikes = await Like.aggregate([
+        const totalLikes = await Video.aggregate([
             {
                 $match: {
-                    likedBy: new mongoose.Types.ObjectId(userData.user._id),
+                    owner: new mongoose.Types.ObjectId(userData.user._id),
+                },
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "contentID",
+                    as: "likes",
+                },
+            },
+            {
+                $project: {
+                    likes: { $size: "$likes" },
                 },
             },
             {
                 $group: {
-                    _id: "$likedBy",
-                    totalLikes: { $sum: 1 },
+                    _id: "$owner",
+                    totalLikes: { $sum: "$likes" },
                 },
             },
         ]);

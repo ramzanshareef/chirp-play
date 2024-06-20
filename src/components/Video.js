@@ -10,7 +10,7 @@ import { formatTime } from "@root/utils/time";
 export const VideoComp = ({ video }) => {
     return (
         <>
-            <Link className="max-w-sm rounded overflow-hidden shadow-lg hover:cursor-pointer"
+            <Link className="max-w-sm rounded overflow-hidden shadow-lg hover:cursor-pointer max-sm:mx-auto"
                 href={`/video/${video._id}`}
             >
                 <div className="relative">

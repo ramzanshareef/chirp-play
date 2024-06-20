@@ -17,7 +17,7 @@ const Header = ({ userData }) => {
     return (
         <>
             <header
-                className="flex justify-between items-center px-2 sm:px-4 py-1 bg-white sticky top-0 w-full z-50 shadow-md"
+                className="flex justify-between items-center px-2 sm:px-4 py-1 bg-white sticky top-0 w-full z-50"
             >
                 <div className="flex items-center gap-x-4">
                     <Image src="/navbar.svg" alt="Sidebar" width={24} height={24} className="hidden sm:block cursor-pointer hover:opacity-75" />

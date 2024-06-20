@@ -4,7 +4,7 @@ import { PiDotsThreeVerticalBold } from "react-icons/pi";
 const HeaderSkeleton = () => {
     return (
         <>
-            <header className="flex justify-between items-center px-2 sm:px-4 py-1 bg-white sticky top-0 w-full z-50 shadow-md">
+            <header className="flex justify-between items-center px-2 sm:px-4 py-1 bg-white sticky top-0 w-full z-50">
                 <div className="flex items-center gap-x-4">
                     <div className="h-6 w-6 bg-gray-300 rounded-full animate-pulse"></div>
                     <div className="h-12 w-16 bg-gray-300 rounded animate-pulse"></div>

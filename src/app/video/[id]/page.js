@@ -10,19 +10,28 @@ import { MdPlaylistAdd, MdPlaylistAddCheck } from "react-icons/md";
 import Comments from "./Comments";
 import { Suspense } from "react";
 import { VideoPlayerComponent } from "./VideoPlayer";
+import { LikeButton, SubscribeButton } from "./ClientComponents";
+import { getSubscribers } from "@root/actions/channel/subscribe";
+import { getLikes } from "@root/actions/like";
 
 export default async function VideoPage({ params }) {
     const userDetails = await getUserData();
     const { video } = await getVideo(params.id);
+    const { totalSubscribers } = await getSubscribers(video.owner._id);
+    const { totalLikes } = await getLikes(video._id);
     await increaseVideoView(params.id);
     const suggestedVideosData = await suggestedVideos(params.id);
     return (
         <>
             <div className="flex flex-col md:flex-row">
                 <div className="flex flex-col w-full md:w-[70%] p-4">
+
                     {/* video player */}
                     <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg"></div>}>
-                        <VideoPlayerComponent videoID={params?.id} />
+                        {/* <VideoPlayerComponent videoID={params?.id} /> */}
+                        <div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg">
+                            This is a video player placeholder, to be replaced with a real video player.
+                        </div>
                     </Suspense>
 
                     {/* video details */}
@@ -42,23 +51,19 @@ export default async function VideoPage({ params }) {
                                 />
                                 <div className="ml-4">
                                     <div className="font-bold">{video.owner.name}</div>
-                                    <div className="text-gray-600 text-xs">{video.owner.subscribers || 0} subscribers</div>
+                                    <div className="text-gray-600 text-xs">{totalSubscribers + " "}subscribers
+                                    </div>
                                 </div>
-                                <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 sm:ml-4 p-2 flex items-center gap-x-2 ml-auto"
-                                >
-                                    <FaRegBell size={20} />
-                                    <span className="hidden sm:block">
-                                        Subscribe
-                                    </span>
-                                </button>
+                                <SubscribeButton
+                                    channelID={video.owner._id}
+                                    videoID={video._id}
+                                />
                             </div>
                             <div className="flex">
-                                <button
-                                    className="bg-indigo-400 hover:bg-indigo-500 mr-2 p-2 flex items-center gap-x-2"
-                                >
-                                    <AiOutlineLike size={20} /> {video.likes || 0}
-                                </button>
+                                <LikeButton
+                                    videoID={video._id}
+                                    totalLikes={totalLikes}
+                                />
                                 <button
                                     className="bg-indigo-400 hover:bg-indigo-500 p-2"
                                 >
@@ -117,7 +122,9 @@ export default async function VideoPage({ params }) {
                         <Comments />
                     </div>
                 </div>
+
                 <div className="w-full md:w-[30%]">
+
                     {/* suggested videos */}
                     <div className="flex flex-col gap-y-4 p-4">
                         {suggestedVideosData?.videos?.map(video => (

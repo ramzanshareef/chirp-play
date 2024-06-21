@@ -1,11 +1,12 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/app/_home/Header";
+import Header, { Sidebar } from "@/app/_home/Header";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getUserData } from "@root/actions/user/data";
 import { Suspense } from "react";
 import NextTopLoader from "nextjs-toploader";
+import Footer from "./_home/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,23 +25,36 @@ export default async function RootLayout({ children }) {
                     initialPosition={0.2}
                     crawl={false}
                     crawlSpeed={300}
+                    zIndex={10000}
                 />
-                <ToastContainer
-                    autoClose={1200}
-                    hideProgressBar={true}
-                    position="top-center"
-                    closeOnClick={true}
-                    pauseOnHover={false}
-                    draggable={false}
-                    closeButton={false}
-                    limit={5}
-                    newestOnTop={true}
-                    className="z-max"
-                />
-                <Suspense>
-                    <HeaderWithSuspense />
-                </Suspense>
-                {children}
+                <div className="flex flex-row max-h-screen">
+                    <ToastContainer
+                        autoClose={1200}
+                        hideProgressBar={true}
+                        position="top-center"
+                        closeOnClick={true}
+                        pauseOnHover={false}
+                        draggable={false}
+                        closeButton={false}
+                        limit={5}
+                        newestOnTop={true}
+                        className="z-max"
+                    />
+                    <Suspense>
+                        <SidebarWithSuspense />
+                    </Suspense>
+                    <div className="w-full flex flex-col">
+                        <Suspense>
+                            <HeaderWithSuspense />
+                        </Suspense>
+                        <div className="sm:py-5 sm:px-12 overflow-y-scroll scrollbar-hide">
+                            {children}
+                        </div>
+                        <Suspense>
+                            <FooterWithSuspense />
+                        </Suspense>
+                    </div>
+                </div>
             </body>
         </html>
     );
@@ -49,4 +63,14 @@ export default async function RootLayout({ children }) {
 async function HeaderWithSuspense() {
     let userData = await getUserData();
     return <Header userData={userData} />;
+}
+
+async function SidebarWithSuspense() {
+    let userData = await getUserData();
+    return <Sidebar userData={userData} />;
+}
+
+async function FooterWithSuspense() {
+    let userData = await getUserData();
+    return <Footer userData={userData} />;
 }

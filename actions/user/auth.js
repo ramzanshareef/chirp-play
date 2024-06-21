@@ -3,6 +3,7 @@
 import { getSession } from "@root/utils/session";
 import User from "@root/models/User";
 import connectDB from "@root/actions/db/connectDB";
+import { revalidatePath } from "next/cache";
 
 const bcryptjs = require("bcryptjs");
 
@@ -90,6 +91,7 @@ export async function userLogin(currentState, formData) {
 export async function userLogout() {
     try {
         (await getSession()).destroy();
+        revalidatePath("/");
         return { status: 200, message: "Logged out" };
     }
     catch (err) {

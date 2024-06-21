@@ -5,8 +5,10 @@ import Comment from "@root/models/Comment";
 import Video from "@root/models/Video";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
+import { getUserData } from "./user/data";
+import User from "@root/models/User";
 
-export const getAllVideoes = async () => {
+export const getAllVideos = async () => {
     try {
         await connectDB();
         const videos = await Video.find({}).populate("owner", "name username avatar coverImage");
@@ -70,6 +72,10 @@ export const increaseVideoView = async (videoId) => {
     try {
         await connectDB();
         await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+        let userData = await getUserData();
+        if (userData.status === 200) {
+            await User.findByIdAndUpdate(userData.user._id, { $addToSet: { watchHistory: videoId } });
+        }
         revalidatePath(`/video/${videoId}`);
         revalidatePath("/dashboard");
         return { status: 200 };

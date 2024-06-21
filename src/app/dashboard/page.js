@@ -100,12 +100,12 @@ async function StatsWithSuspense() {
     return (
         <>
             <div
-                className="flex justify-center items-center gap-x-4 bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
+                className="flex justify-evenly items-center text-center bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
             >
-                <div className="w-fit bg-indigo-500 p-2 rounded-full">
+                <div className="w-fit bg-indigo-500 p-2 rounded-full text-center">
                     <FaRegEye className="text-white text-xl" />
                 </div>
-                <p>
+                <p className="flex flex-col items-center text-center">
                     Total Views: <br />
                     <span className="text-2xl font-bold">
                         {data?.totalViews?.toLocaleString("en-IN")}
@@ -113,12 +113,12 @@ async function StatsWithSuspense() {
                 </p>
             </div>
             <div
-                className="flex justify-center items-center gap-x-4 bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
+                className="flex justify-evenly items-center text-center bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
             >
-                <div className="w-fit bg-indigo-500 p-2 rounded-full">
+                <div className="w-fit bg-indigo-500 p-2 rounded-full text-center">
                     <FaHeart className="text-white text-xl" />
                 </div>
-                <p>
+                <p className="flex flex-col items-center text-center">
                     Total Likes: <br />
                     <span className="text-2xl font-bold">
                         {data?.totalLikes?.toLocaleString("en-IN")}
@@ -126,12 +126,12 @@ async function StatsWithSuspense() {
                 </p>
             </div>
             <div
-                className="flex justify-center items-center gap-x-4 bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
+                className="flex justify-evenly items-center text-center bg-white p-4 rounded-lg shadow-lg w-full sm:w-1/3 border-2"
             >
-                <div className="w-fit bg-indigo-500 p-2 rounded-full">
+                <div className="w-fit bg-indigo-500 p-2 rounded-full text-center">
                     <RiUserFollowFill className="text-white text-xl" />
                 </div>
-                <p>
+                <p className="flex flex-col items-center text-center">
                     Total Subscribers: <br />
                     <span className="text-2xl font-bold">
                         {data?.totalSubscribers?.toLocaleString("en-IN")}

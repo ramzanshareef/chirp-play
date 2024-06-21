@@ -1,8 +1,8 @@
 import { VideoComp } from "@/components/Video";
-import { getAllVideoes } from "@root/actions/video";
+import { getAllVideos } from "@root/actions/video";
 
 export default async function Home() {
-    const videosData = await getAllVideoes();
+    const videosData = await getAllVideos();
     return (
         <>
             <div>

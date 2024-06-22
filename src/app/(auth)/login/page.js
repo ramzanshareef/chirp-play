@@ -1,8 +1,13 @@
+import { Suspense } from "react";
 import LoginForm from "./LoginForm";
 
-export default async function LoginPage() {
+export default async function LoginPage({ searchParams }) {
     return <>
-        <LoginForm />
+        <Suspense>
+            <LoginForm 
+                searchParams={searchParams}
+            />
+        </Suspense>
     </>;
 }
 

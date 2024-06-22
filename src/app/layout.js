@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header, { Sidebar } from "@/app/_home/Header";
-import { ToastContainer } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getUserData } from "@root/actions/user/data";
 import { Suspense } from "react";
@@ -32,6 +32,7 @@ export default async function RootLayout({ children }) {
                         autoClose={1200}
                         hideProgressBar={true}
                         position="top-center"
+                        transition={Slide}
                         closeOnClick={true}
                         pauseOnHover={false}
                         draggable={false}
@@ -47,7 +48,7 @@ export default async function RootLayout({ children }) {
                         <Suspense>
                             <HeaderWithSuspense />
                         </Suspense>
-                        <div className="sm:py-5 sm:px-12 overflow-y-scroll scrollbar-hide">
+                        <div className="px-4 py-2 pb-20 sm:py-5 sm:px-20 overflow-y-scroll scrollbar-hide">
                             {children}
                         </div>
                         <Suspense>

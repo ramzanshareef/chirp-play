@@ -10,7 +10,7 @@ export async function middleware(request) {
 
     if (protectedRoutes.includes(path)) {
         if (!isAuth) {
-            return NextResponse.redirect(new URL(`/login?redirctTo=${path}`, request.nextUrl.origin).toString());
+            return NextResponse.redirect(new URL(`/login?redirectTo=${path}`, request.nextUrl.origin).toString());
         }
         return NextResponse.next();
     }

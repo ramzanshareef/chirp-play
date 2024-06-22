@@ -1,12 +1,12 @@
 "use server";
 
 import connectDB from "@root/actions/db/connectDB";
+import mongoose from "mongoose";
 import Comment from "@root/models/Comment";
 import Video from "@root/models/Video";
-import mongoose from "mongoose";
+import User from "@root/models/User";
 import { revalidatePath } from "next/cache";
 import { getUserData } from "./user/data";
-import User from "@root/models/User";
 
 export const getAllVideos = async () => {
     try {
@@ -92,6 +92,36 @@ export const suggestedVideos = async (videoId) => {
         return {
             status: 200,
             videos: JSON.parse(JSON.stringify([...videos]))
+        };
+    }
+    catch (error) {
+        return { status: 500, message: error.message };
+    }
+};
+
+export const searchVideos = async (query) => {
+    try {
+        await connectDB();
+        const videos = await Video.find({
+            $or: [
+                { title: { $regex: query, $options: "i" } },
+                { description: { $regex: query, $options: "i" } },
+                {
+                    owner: {
+                        $in: await User.find({
+                            $or: [
+                                { name: { $regex: query, $options: "i" } },
+                                { username: { $regex: query, $options: "i" } }
+                            ]
+                        }).distinct("_id")
+                    }
+                }
+            ]
+        }).populate("owner", "name username avatar");
+        revalidatePath(`/search?q=${query}`);
+        return {
+            status: 200,
+            videos: JSON.parse(JSON.stringify(videos))
         };
     }
     catch (error) {

@@ -1,4 +1,4 @@
-import Upload from "./Upload";
+import VideoUpload from "./Upload";
 import { VideoCard } from "@/app/dashboard/VideoCard";
 import { getUserData } from "@root/actions/user/data";
 import { getUserVideos, totalStatsofUser } from "@root/actions/user/video";
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
                 <Suspense fallback={<UserWithSuspenseFallback />}>
                     <UserWithSuspense />
                 </Suspense>
-                <Upload />
+                <VideoUpload />
             </div>
             <div className="flex flex-col gap-y-2 sm:flex-row sm:gap-x-2 sm:gap-y-0">
                 <Suspense fallback={<StatsWithSuspenseFallback />}>

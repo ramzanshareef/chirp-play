@@ -18,11 +18,11 @@ export const SubmitButton = ({ title, size, className }) => {
                 `}
                 disabled={pending}
             >
-                <p
+                <div
                     className={` ${pending === true ? "hidden" : ""} `}
                 >
                     {title}
-                </p>
+                </div>
                 <div className={` ${pending === true ? "flex justify-center items-center" : "hidden"}  `}>
                     <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white">
                     </div>

@@ -40,6 +40,8 @@ export async function videoUpload(currentState, formData) {
                 duration: parseInt(videoLength)
             });
             revalidatePath("/dashboard");
+            revalidatePath("/user/" + userData.user._id);
+            revalidatePath("/user/" + userData.user._id + "?tab=videos");
             return { status: 200, message: "Video uploaded successfully" };
         }
         catch (err) {

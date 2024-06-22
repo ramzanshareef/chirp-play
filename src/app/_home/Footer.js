@@ -11,13 +11,13 @@ import { IoMdFolderOpen } from "react-icons/io";
 export default function Footer({ userData }) {
     const pathname = usePathname();
     return (
-        <footer className="fixed bottom-0 w-full bg-gray-100 py-1.5 text-center sm:hidden">
-            <div className="flex flex-row justify-around items-center transition-all duration-300 ">
+        <footer className="fixed bottom-0 w-full bg-gray-500 py-2 text-center sm:hidden mt-2">
+            <div className="flex flex-row justify-around items-center transition-all duration-300 text-white">
                 <Link
                     href="/"
                     title="Home"
                     className={`flex flex-col items-center transition-all duration-300 
-                    ${pathname === "/" ? "text-white bg-indigo-600 p-2 rounded-md" : "text-gray-600"}`}>
+                    ${pathname === "/" ? "bg-indigo-600 p-2 rounded-md" : "text-gray-300"}`}>
                     <FiHome size={25} />
                     <span className="text-xs">Home</span>
                 </Link>
@@ -25,7 +25,7 @@ export default function Footer({ userData }) {
                     href="/dashboard"
                     title="Dashboard"
                     className={`flex flex-col items-center transition-all duration-300  
-                    ${pathname.includes("/dashboard") ? "text-white bg-indigo-600 p-2 rounded-md" : "text-gray-600"}
+                    ${pathname.includes("/dashboard") ? "bg-indigo-600 p-2 rounded-md" : "text-gray-300"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <LuLayoutDashboard size={25} />
@@ -35,7 +35,7 @@ export default function Footer({ userData }) {
                     href="/liked-videos"
                     title="Liked Videos"
                     className={`flex flex-col items-center transition-all duration-300 
-                    ${pathname.includes("/liked-videos") ? "text-white bg-indigo-600 p-2 rounded-md" : "text-gray-600"}
+                    ${pathname.includes("/liked-videos") ? "bg-indigo-600 p-2 rounded-md" : "text-gray-300"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <AiOutlineLike size={25} />
@@ -45,7 +45,7 @@ export default function Footer({ userData }) {
                     href="/history"
                     title="History"
                     className={`flex flex-col items-center transition-all duration-300  
-                    ${pathname.includes("/history") ? "text-white bg-indigo-600 p-2 rounded-md" : "text-gray-600"}
+                    ${pathname.includes("/history") ? "bg-indigo-600 p-2 rounded-md" : "text-gray-300"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <GoHistory size={25} />
@@ -55,7 +55,7 @@ export default function Footer({ userData }) {
                     href="/playlists"
                     title="Playlists"
                     className={`flex flex-col items-center transition-all duration-300 
-                    ${pathname.includes("/playlists") ? "text-white bg-indigo-600 p-2 rounded-md" : "text-gray-600"}
+                    ${pathname.includes("/playlists") ? "bg-indigo-600 p-2 rounded-md" : "text-gray-300"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <IoMdFolderOpen size={25} />

@@ -4,7 +4,7 @@ import React from "react";
 import { VideoUploadModal } from "@/components/modals/videoUpload";
 import { FaPlus } from "react-icons/fa";
 
-const Upload = () => {
+const VideoUpload = () => {
     const [isOpen, setIsOpen] = React.useState(false);
     return (
         <>
@@ -23,4 +23,4 @@ const Upload = () => {
     );
 };
 
-export default Upload;
+export default VideoUpload;

@@ -124,7 +124,7 @@ const Header = ({ userData }) => {
                         onClick={() => setDropdownOpen(!dropdownOpen)}
                     />
                     <Link className="border border-gray-400 text-blue-600 hover:bg-blue-200 flex rounded-full px-2 py-1 max-sm:p-2 gap-x-2"
-                        href={userData.user ? "/profile" : "/login"}
+                        href={userData.user ? "/user/" + userData?.user._id : "/login"}
                     >
                         {userData.user ? <div className="flex gap-2">
                             <Image src={userData.user?.avatar} alt={userData.user.name} width={24} height={24} className="rounded-full" />
@@ -148,7 +148,7 @@ const Header = ({ userData }) => {
                                 <ul className="flex flex-col gap-5 border-b border-gray-300 px-6 py-4">
                                     <li className="hover:text-indigo-600">
                                         <Link
-                                            href={`/profile/${userData.user.username}`}
+                                            href={`/user/${userData.user._id}`}
                                             className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
                                         >
                                             <CgProfile size={22} />
@@ -282,16 +282,16 @@ export const Sidebar = ({ userData }) => {
                     <Link
                         href="/"
                         title="Home"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname === "/" ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""} `}>
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname === "/" ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"} `}>
                         <FiHome size={18} />
                         <span className="ml-2">Home</span>
                     </Link>
                     <Link
                         href="/dashboard"
                         title="Dashboard"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname.includes("/dashboard") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""}
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname.includes("/dashboard") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"}
                         ${userData?.status === 200 ? "" : "hidden"}
                         `}>
                         <LuLayoutDashboard size={18} />
@@ -300,8 +300,8 @@ export const Sidebar = ({ userData }) => {
                     <Link
                         href="/liked-videos"
                         title="Liked Videos"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname.includes("/liked-videos") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""}
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname.includes("/liked-videos") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"}
                         ${userData?.status === 200 ? "" : "hidden"}
                         `}>
                         <AiOutlineLike size={18} />
@@ -310,8 +310,8 @@ export const Sidebar = ({ userData }) => {
                     <Link
                         href="/history"
                         title="History"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname.includes("/history") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""}
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname.includes("/history") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"}
                         ${userData?.status === 200 ? "" : "hidden"}
                         `}>
                         <GoHistory size={18} />
@@ -320,8 +320,8 @@ export const Sidebar = ({ userData }) => {
                     <Link
                         href="/playlists"
                         title="My Playlists"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname.includes("/playlists") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""}
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname.includes("/playlists") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"}
                         ${userData?.status === 200 ? "" : "hidden"}
                         `}>
                         <IoMdFolderOpen size={18} />
@@ -330,16 +330,16 @@ export const Sidebar = ({ userData }) => {
                     <Link
                         href="/help"
                         title="Help"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full mt-auto
-                            ${pathname.includes("/help") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""} `}>
+                        className={`flex items-center px-4 py-2 rounded-lg w-full mt-auto
+                            ${pathname.includes("/help") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"} `}>
                         <IoIosHelpCircleOutline size={18} />
                         <span className="ml-2">Help</span>
                     </Link>
                     <Link
                         href="/settings"
                         title="Settings"
-                        className={`flex items-center hover:text-white hover:bg-indigo-500 px-4 py-2 rounded-lg w-full
-                        ${pathname.includes("/settings") ? "bg-indigo-600 text-white hover:bg-indigo-600" : ""}
+                        className={`flex items-center px-4 py-2 rounded-lg w-full
+                        ${pathname.includes("/settings") ? "bg-indigo-600 text-white hover:bg-indigo-600" : "hover:text-white hover:bg-indigo-500"}
                         ${userData?.status === 200 ? "" : "hidden"}
                         `}>
                         <CiSettings size={18} />
@@ -379,14 +379,14 @@ export const Sidebar = ({ userData }) => {
                 <Link
                     href="/"
                     title="Home"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md ${pathname === "/" ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}`}>
+                    className={`flex items-center p-2 hover:rounded-md ${pathname === "/" ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}`}>
                     <FiHome size={25} />
                 </Link>
                 <Link
                     href="/dashboard"
                     title="Dashboard"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md 
-                    ${pathname.includes("/dashboard") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}
+                    className={`flex items-center0 p-2 hover:rounded-md 
+                    ${pathname.includes("/dashboard") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <LuLayoutDashboard size={25} />
@@ -394,8 +394,8 @@ export const Sidebar = ({ userData }) => {
                 <Link
                     href="/liked-videos"
                     title="Liked Videos"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md 
-                    ${pathname.includes("/liked-videos") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}
+                    className={`flex items-center p-2 hover:rounded-md 
+                    ${pathname.includes("/liked-videos") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <AiOutlineLike size={25} />
@@ -403,8 +403,8 @@ export const Sidebar = ({ userData }) => {
                 <Link
                     href="/history"
                     title="History"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md 
-                    ${pathname.includes("/history") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}
+                    className={`flex items-center p-2 hover:rounded-md 
+                    ${pathname.includes("/history") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <GoHistory size={25} />
@@ -412,8 +412,8 @@ export const Sidebar = ({ userData }) => {
                 <Link
                     href="/playlists"
                     title="My Playlists"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md 
-                    ${pathname.includes("/playlists") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}
+                    className={`flex items-center p-2 hover:rounded-md 
+                    ${pathname.includes("/playlists") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <IoMdFolderOpen size={25} />
@@ -421,14 +421,14 @@ export const Sidebar = ({ userData }) => {
                 <Link
                     href="/help"
                     title="Help"
-                    className={`flex items-center mt-auto hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md ${pathname.includes("/help") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}`}>
+                    className={`flex items-center mt-auto p-2 hover:rounded-md ${pathname.includes("/help") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}`}>
                     <IoIosHelpCircleOutline size={25} />
                 </Link>
                 <Link
                     href="/settings"
                     title="Settings"
-                    className={`flex items-center hover:text-white hover:bg-indigo-600 p-2 hover:rounded-md 
-                    ${pathname.includes("/settings") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600"}
+                    className={`flex items-center p-2 hover:rounded-md 
+                    ${pathname.includes("/settings") ? "text-white bg-indigo-600 rounded-md" : "text-gray-600 hover:text-white hover:bg-indigo-600"}
                     ${userData?.status === 200 ? "" : "hidden"}
                     `}>
                     <CiSettings size={25} />

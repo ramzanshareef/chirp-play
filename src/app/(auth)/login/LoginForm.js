@@ -7,7 +7,7 @@ import { userLogin } from "@root/actions/user/auth";
 import { useEffect, useActionState } from "react";
 import { useRouter } from "next/navigation";
 
-const LoginForm = () => {
+const LoginForm = ({ searchParams }) => {
     const [state, submitAction] = useActionState(userLogin, null);
     const router = useRouter();
 
@@ -17,16 +17,22 @@ const LoginForm = () => {
                 onClose: () => {
                     document.getElementById("loginForm").reset();
                 },
+                onClick: () => {
+                    document.getElementById("loginForm").reset();
+                }
             });
         }
         else if (state?.status === 200) {
             toast.success(state?.message, {
                 onClose: () => {
-                    router.push("/");
+                    router.push(searchParams?.redirectTo || "/");
                 },
+                onClick: () => {
+                    router.push(searchParams?.redirectTo || "/");
+                }
             });
         }
-    }, [router, state]);
+    }, [router, searchParams?.redirectTo, state]);
 
     return (
         <div className="flex">

@@ -1,22 +1,16 @@
-"use server";
-
+import connectDB from "@root/actions/db/connectDB";
+import { getUserData } from "@root/actions/user/data";
 import User from "@root/models/User";
-import connectDB from "../db/connectDB";
 import mongoose from "mongoose";
-import { getUserData } from "./data";
 
-export async function getAUserData(userID) {
+export async function GET() {
     try {
         await connectDB();
         const loggedUserData = await getUserData();
-        let isAuth = false;
-        let isCurrentUser = false;
-        if (loggedUserData?.user?._id) isAuth = true;
-        if (loggedUserData?.user?._id === userID) isCurrentUser = true;
         const userDetails = await User.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(userID)
+                    _id: new mongoose.Types.ObjectId("6673931a872ab72a664f724a")
                 }
             },
             {
@@ -93,6 +87,7 @@ export async function getAUserData(userID) {
                         },
                         {
                             $project: {
+                                _id: 0,
                                 content: 1,
                                 createdAt: 1,
                                 totalLikes: 1,
@@ -160,27 +155,27 @@ export async function getAUserData(userID) {
                     localField: "_id",
                     foreignField: "channel",
                     as: "subscribersToUser",
-                    pipeline: [
-                        {
-                            $lookup: {
-                                from: "users",
-                                localField: "subscriber",
-                                foreignField: "_id",
-                                as: "subscriberDetails",
-                            }
-                        },
-                        {
-                            $project: {
-                                _id: 0,
-                                subscriber: 1,
-                                subscriberDetails: {
-                                    name: 1,
-                                    username: 1,
-                                    avatar: 1
-                                }
-                            }
-                        }
-                    ]
+                    // pipeline: [
+                    //     {
+                    //         $lookup: {
+                    //             from: "users",
+                    //             localField: "subscriber",
+                    //             foreignField: "_id",
+                    //             as: "subscriberDetails",
+                    //         }
+                    //     },
+                    //     {
+                    //         $project: {
+                    //             _id: 0,
+                    //             subscriber: 1,
+                    //             subscriberDetails: {
+                    //                 name: 1,
+                    //                 username: 1,
+                    //                 avatar: 1
+                    //             }
+                    //         }
+                    //     }
+                    // ]
                 }
             },
             {
@@ -231,14 +226,15 @@ export async function getAUserData(userID) {
                 }
             }
         ]);
-        return {
+        return Response.json({
             status: 200,
-            user: JSON.parse(JSON.stringify(userDetails)),
-            isAuth: isAuth,
-            isCurrentUser: isCurrentUser
-        };
+            data: userDetails
+        });
     }
-    catch (error) {
-        return { status: 500, message: error.message };
+    catch (err) {
+        return Response.json({
+            status: 500,
+            message: "Internal Server Error " + err.message
+        });
     }
 }

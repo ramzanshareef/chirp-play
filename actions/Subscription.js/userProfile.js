@@ -34,7 +34,7 @@ export async function subscribeHandlerToUser(userID) {
         });
         revalidatePath("/dashboard");
         revalidatePath(`/user/${userID}`);
-        return { status: 200, message: "Subscribed Successfully 🙂" };
+        return { status: 200, message: "Subscribed Successfully 😊" };
     }
     catch (err) {
         return { status: 500, message: "Internal server error " + err.message };

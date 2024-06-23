@@ -1,24 +1,21 @@
 import { getAUserData } from "@root/actions/user/otherUser";
 import Image from "next/image";
 import { ContentBox, SubscribeButton } from "./ClientComponents";
-import { getUserData, getUsersSubsribedData } from "@root/actions/user/data";
 import { Suspense } from "react";
 import moment from "moment";
 
 export default async function UserPage({ params, searchParams }) {
     const userDetails = await getAUserData(params?.userID);
-    const loggedInUser = await getUserData();
-    const usersSubsribedData = await getUsersSubsribedData();
     return <>
         <Suspense>
             <div
                 className="relative h-40 w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${userDetails?.user?.coverImage})` }}
+                style={{ backgroundImage: `url(${userDetails?.user[0]?.coverImage})` }}
             >
                 <div className="absolute bottom-0 left-4 transform translate-y-1/2">
                     <Image
-                        src={userDetails?.user?.avatar}
-                        alt={`${userDetails?.user?.name}'s avatar`}
+                        src={userDetails?.user[0]?.avatar}
+                        alt={`${userDetails?.user[0]?.name}'s avatar`}
                         className="h-24 w-24 rounded-full border-4 border-white"
                         width={96}
                         height={96}
@@ -27,23 +24,24 @@ export default async function UserPage({ params, searchParams }) {
             </div>
             <div className="mt-12 flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl font-bold">{userDetails?.user?.name}</h1>
-                    <p className="text-gray-600 text-sm">@{userDetails?.user?.username} • Joined {moment(userDetails?.user?.createdAt).format("MMMM YYYY")}</p>
-                    <p className="text-gray-600">{userDetails?.subscribers} subscribers</p>
+                    <h1 className="text-xl font-bold">{userDetails?.user[0]?.name}</h1>
+                    <p className="text-gray-600 text-sm">@{userDetails?.user[0]?.username} • Joined {moment(userDetails?.user[0]?.createdAt).format("MMMM YYYY")}</p>
+                    <p className="text-gray-600">
+                        {userDetails?.user[0]?.subscribersToUser ? userDetails?.user?.length : 0} subscribers
+                    </p>
                 </div>
                 <SubscribeButton
                     userID={params?.userID}
-                    loggedInUser={loggedInUser}
+                    isSubscribed={userDetails?.user[0]?.isSubscribed}
+                    isAuth={userDetails?.isAuth}
+                    isCurrentUser={userDetails?.isCurrentUser}
                 />
             </div>
             <ContentBox
                 userDetails={userDetails}
-                videos={userDetails?.videos}
+                isAuth={userDetails?.isAuth}
                 activeTab={searchParams?.tab || "videos"}
-                loggedInUser={loggedInUser}
-                chirps={userDetails?.chirps}
-                chirpLikes={userDetails?.chirpLikes}
-                usersSubsribedData={usersSubsribedData?.subscribedUsers}
+                isCurrentUser={userDetails?.isCurrentUser}
             />
         </Suspense>
     </>;

@@ -37,7 +37,11 @@ export async function getChirps(userID) {
 export async function addChirp(currentState, formData) {
     try {
         await connectDB();
-        let currUser = currentState.currUser;
+        const loggedUserData = await getUserData();
+        if (loggedUserData.status !== 200) {
+            return { status: 401, message: "Unauthorized" };
+        }
+        let currUser = loggedUserData?.user;
         if (!currUser) {
             return { status: 401, message: "Unauthorized" };
         }

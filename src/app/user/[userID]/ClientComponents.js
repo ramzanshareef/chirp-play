@@ -4,13 +4,12 @@
 
 import { SubmitButton } from "@/components/buttons/SubmitButton";
 import { subscribeHandlerToUser } from "@root/actions/Subscription.js/userProfile";
-import { subscriptionStatus } from "@root/actions/channel/subscribe";
 import { formatTime } from "@root/utils/time";
 import moment from "moment";
 import { CldImage } from "next-cloudinary";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useActionState, useOptimistic } from "react";
+import { useEffect, useActionState, useOptimistic, useState } from "react";
 import { FiTwitter } from "react-icons/fi";
 import { FaUserPlus, FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -19,58 +18,56 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { FcLike } from "react-icons/fc";
 import { addChirp, likeChirp } from "@root/actions/chirp";
 import VideoUpload from "@/app/dashboard/Upload";
+import { IoPlayOutline } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa";
 
-export const SubscribeButton = ({ userID, loggedInUser }) => {
-    const [subscriberStatus, setSubscriberStatus] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            let res = await subscriptionStatus(userID);
-            if (res.status === 200) {
-                setSubscriberStatus(res.isSubscribed);
-            }
-        })();
-    }, [userID]);
-
+export const SubscribeButton = ({ userID, isSubscribed, isAuth, isCurrentUser }) => {
     return <>
-        <button className={` flex items-center gap-2 rounded-md py-2 px-4 text-white ${loggedInUser?.user?._id === userID && "hidden"}  ${subscriberStatus ? "bg-green-600 hover:bg-green-700" : "hover:bg-red-700 bg-red-600"} `}
+        <button className={` flex items-center gap-2 rounded-md py-2 px-4 text-white 
+        ${isCurrentUser && "hidden"}  
+        ${isAuth && isSubscribed ? "bg-indigo-600 hover:bg-indigo-700" : "hover:bg-red-700 bg-red-600"} `}
             onClick={async (e) => {
                 e.preventDefault();
-                if (loggedInUser.status !== 200) {
+                if (!isAuth) {
                     toast.error("Please Login to Subscribe");
                     return;
                 }
                 let res = await subscribeHandlerToUser(userID);
                 if (res.status === 200) {
-                    toast.success(res.message, {
-                        onClick: setSubscriberStatus(!subscriberStatus),
-                        onClose: setSubscriberStatus(!subscriberStatus),
-                    });
+                    toast.success(res.message);
                 }
                 else {
                     toast.error(res.message);
                 }
             }}
         >
-            {subscriberStatus ? <FaUserCheck size={20} /> : <FaUserPlus size={20} />}
+            {isSubscribed ? <FaUserCheck size={20} /> : <FaUserPlus size={20} />}
             <span className="hidden sm:block">
-                {subscriberStatus ? "Subscribed" : "Subscribe"}
+                {isSubscribed ? "Subscribed" : "Subscribe"}
             </span>
         </button>
     </>;
 };
 
-export const ContentBox = ({ userDetails, videos, activeTab, loggedInUser, chirps, chirpLikes, usersSubsribedData }) => {
+export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) => {
     const router = useRouter();
 
     const renderContent = () => {
         switch (activeTab) {
             case "videos":
-                return <VideoContent videos={videos} userDetails={userDetails} loggedInUser={loggedInUser} />;
+                return <VideoContent
+                    videos={userDetails?.user[0]?.videos}
+                    isCurrentUser={isCurrentUser}
+                />;
             case "chirps":
-                return <ChirpsContent userDetails={userDetails} loggedInUser={loggedInUser} chirps={chirps} chirpLikes={chirpLikes} />;
-            case "subrscribed":
-                return <SubrscribedContent usersSubsribedData={usersSubsribedData} />;
+                return <ChirpsContent
+                    userDetails={userDetails}
+                    isCurrentUser={isCurrentUser}
+                />;
+            case "subscribed":
+                return <SubrscribedContent
+                    userDetails={userDetails}
+                />;
             case "playlist":
                 return <div>Playlist Content</div>;
             default:
@@ -79,20 +76,20 @@ export const ContentBox = ({ userDetails, videos, activeTab, loggedInUser, chirp
     };
 
     const renderTabs = ["videos", "chirps"];
-    if (loggedInUser?.user?._id === userDetails?.user?._id) {
-        renderTabs.push(...["subrscribed", "playlist", "settings"]);
+    if (isCurrentUser) {
+        renderTabs.push(...["subscribed", "playlist", "settings"]);
     }
 
     return <>
         <div className="mt-4">
-            <div className="flex w-full overflow-x-scroll scrollbar-hide">
+            <div className="flex max-w-full overflow-x-scroll scrollbar-hide">
                 {renderTabs.map((tab, index) => {
                     return <button
                         key={index}
-                        className={`py-2 px-4 ${activeTab === tab ? "border-b-4 border-b-indigo-600 text-indigo-600 bg-gray-200 rounded-t-lg" : "text-gray-600 hover:border-b-4 hover:border-b-indigo-600 hover:text-indigo-600 hover:bg-gray-200 hover:rounded-t-lg"}`}
+                        className={`py-2 px-4 overflow-x-scroll scrollbar-hide text-wrap ${activeTab === tab ? "border-b-4 border-b-indigo-600 text-indigo-600 bg-gray-200 rounded-t-lg" : "text-gray-600 hover:border-b-4 hover:border-b-indigo-600 hover:text-indigo-600 hover:bg-gray-200 hover:rounded-t-lg"}`}
                         onClick={(e) => {
                             e.preventDefault();
-                            router.push(`/user/${userDetails?.user?._id}?tab=${tab}`);
+                            router.push(`/user/${userDetails?.user[0]?._id}?tab=${tab}`);
                         }}
                         style={{
                             width: `${100 / renderTabs.length}%`
@@ -109,13 +106,13 @@ export const ContentBox = ({ userDetails, videos, activeTab, loggedInUser, chirp
     </>;
 };
 
-const VideoContent = ({ videos, userDetails, loggedInUser }) => {
+const VideoContent = ({ videos, isCurrentUser }) => {
     return <div
         className="flex flex-col gap-y-1 sm:gap-y-4"
     >
         <div
             className={` flex-row gap-x-4
-                ${loggedInUser?.user?._id === userDetails?.user?._id ? "flex" : "hidden"}
+                ${isCurrentUser ? "flex" : "hidden"}
             `}
         >
             <VideoUpload />
@@ -150,38 +147,43 @@ const VideoContent = ({ videos, userDetails, loggedInUser }) => {
                     </div>
                 </div>;
             })}
+            {videos?.length === 0
+                &&
+                <div className="w-fit mx-auto text-center flex flex-col items-center justify-center text-gray-600">
+                    <IoPlayOutline size={40} />
+                    <span>
+                        No Videos Found 😫
+                    </span>
+                </div>}
         </div>
     </div>;
 };
 
-const ChirpsContent = ({ chirps, userDetails, loggedInUser, chirpLikes }) => {
-    const [state, formAction] = useActionState(addChirp, {
-        currUser: loggedInUser?.user
-    });
+const ChirpsContent = ({ userDetails, isCurrentUser }) => {
+    const [state, formAction] = useActionState(addChirp, null);
 
-    const [optimisticChirps, setOptimisticChirps] = useOptimistic(chirps,
+    const [optimisticChirps, setOptimisticChirps] = useOptimistic(userDetails?.user[0]?.chirps,
         (newChirp) => [newChirp, ...chirps]
     );
 
     useEffect(() => {
-        if (state.status === 200) {
+        if (state?.status === 200) {
             toast.success(state.message);
             document.getElementById("chirpsForm").reset();
         }
-        else if (state.status === 500) {
+        else if (state?.status === 500) {
             toast.error(state.message);
         }
     }, [state]);
 
-
     return (
         <>
             <div className={` flex-row gap-x-4 
-                ${loggedInUser?.user?._id === userDetails?.user?._id ? "flex" : "hidden"}
+                ${isCurrentUser ? "flex" : "hidden"}
             `} >
                 <Image
-                    src={userDetails?.user?.avatar}
-                    alt={userDetails?.user?.name}
+                    src={userDetails?.user[0]?.avatar}
+                    alt={userDetails?.user[0]?.name}
                     className="w-10 h-10 rounded-full"
                     width={40}
                     height={40}
@@ -213,10 +215,10 @@ const ChirpsContent = ({ chirps, userDetails, loggedInUser, chirpLikes }) => {
                 className="flex flex-col gap-y-4 mt-4"
             >
                 {optimisticChirps?.map((chirp) => (
-                    <div key={chirp.id} className="flex flex-row gap-x-4 border-b border-gray-200 pb-4">
+                    <div key={chirp._id} className="flex flex-row gap-x-4 border-b border-gray-200 pb-4">
                         <Image
-                            src={userDetails?.user.avatar}
-                            alt={userDetails?.user.name}
+                            src={userDetails?.user[0].avatar}
+                            alt={userDetails?.user[0].name}
                             className="w-10 h-10 rounded-full"
                             width={40}
                             height={40}
@@ -224,7 +226,7 @@ const ChirpsContent = ({ chirps, userDetails, loggedInUser, chirpLikes }) => {
                         <div className="flex flex-col w-full">
                             <div className="w-full flex flex-row justify-between">
                                 <div className="flex items-center">
-                                    <span className="font-semibold w-fit">{userDetails?.user.name}</span>
+                                    <span className="font-semibold w-fit">{userDetails?.user[0].name}</span>
                                     <div className="text-gray-600 text-xs ml-2">
                                         {moment(chirp.createdAt).fromNow()}
                                     </div>
@@ -246,8 +248,8 @@ const ChirpsContent = ({ chirps, userDetails, loggedInUser, chirpLikes }) => {
                                 {chirp.content}
                             </p>
                             <div className="flex items-center gap-x-2 text-gray-500 text-xs">
-                                {chirpLikes.filter((like) => like.contentID === chirp._id).length > 0 ?
-                                    <FcLike size={20} className="cursor-pointer"
+                                {chirp.isLikedByLoggedUser
+                                    ? <FcLike size={20} className="cursor-pointer"
                                         onClick={async (e) => {
                                             e.preventDefault();
                                             let res = await likeChirp(chirp._id);
@@ -272,44 +274,112 @@ const ChirpsContent = ({ chirps, userDetails, loggedInUser, chirpLikes }) => {
                                         }}
                                     />}
                                 <span>
-                                    {chirpLikes?.filter((like) => like.contentID === chirp._id).length}
+                                    {chirp.totalLikes} likes
                                 </span>
                             </div>
                         </div>
                     </div>
                 ))}
+                {optimisticChirps?.length === 0 &&
+                    <div className="w-fit mx-auto text-center flex flex-col items-center justify-center text-gray-600">
+                        <FiTwitter size={35} />
+                        <span>
+                            No Chirps Found 😫
+                        </span>
+                    </div>}
             </div>
         </>
     );
 };
 
-const SubrscribedContent = ({ usersSubsribedData }) => {
-    console.log(usersSubsribedData);
-    return <>
-        <div className="flex flex-wrap">
-            {/* {usersSubsribedData?.map((user, index) => {
-                return <div className="w-full sm:w-1/4 overflow-hidden sm:pr-2 mb-4 sm:mb-2"
-                    key={index}
-                >
-                    <div className="relative">
-                        <Link href={`/user/${user.channel._id}`}>
-                            <Image
-                                className="w-full h-48 object-cover hover:cursor-pointer rounded-2xl"
-                                src={user.channel.avatar}
-                                alt={user.channel.name}
-                                width={1920}
-                                height={1080}
-                            />
-                        </Link>
-                    </div>
-                    <div className="flex items-start py-4">
-                        <div className="flex-1">
-                            <div className="font-bold mb-1">{user.channel.name}</div>
-                            <div className="text-gray-600 text-xs">{user.channel.username}</div>
+const SubrscribedContent = ({ userDetails }) => {
+    const [searchQuery, setSearchQuery] = useState("");
+    if (!userDetails.isCurrentUser) return null;
+
+    const filteredSubscriptions = userDetails?.user[0]?.subscribedByUser?.filter(sub => {
+        return sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || sub.username.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
+    const handleSearchInputChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const FilteredResults = () => {
+        if (filteredSubscriptions.length === 0) {
+            return (
+                <div className="w-fit mx-auto text-center flex flex-col items-center justify-center text-gray-600">
+                    <FaUsers size={40} />
+                    <span>
+                        No results found for {searchQuery}
+                    </span>
+                </div>
+            );
+        }
+
+        return filteredSubscriptions.map((sub, index) => (
+            <div className="w-full overflow-hidden sm:pr-2 mb-4 sm:mb-2 flex flex-row gap-x-2" key={index}>
+                <Link href={`/user/${sub._id}`}>
+                    <Image
+                        src={sub.avatar}
+                        alt={sub.name}
+                        className="w-10 h-10 rounded-full"
+                        width={40}
+                        height={40}
+                    />
+                </Link>
+                <div className="flex flex-col">
+                    <div className="flex items-center">
+                        <div className="flex flex-row justify-center items-center gap-x-2">
+                            <div className="font-bold">{sub.name}</div>
+                            <div className="text-gray-600 text-xs">@{sub.username}</div>
                         </div>
                     </div>
-                </div>;
-            })} */}
-        </div>
-    </>;
+                    <div className="text-gray-600 text-xs">
+                        {sub.totalSubscribers} subscribers
+                    </div>
+                </div>
+                <div className="ml-auto">
+                    <button
+                        className="flex items-center gap-2 rounded-md py-2 px-4 text-white hover:bg-red-700 bg-red-600"
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            let res = await subscribeHandlerToUser(sub._id);
+                            if (res.status === 200) {
+                                toast.success(res.message);
+                            } else {
+                                toast.error(res.message);
+                            }
+                        }}
+                    >
+                        <FaUserCheck size={20} />
+                        <span className="hidden sm:block">UnSubscribe</span>
+                    </button>
+                </div>
+            </div>
+        ));
+    };
+
+    return (
+        <>
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Search by name or username"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent"
+                />
+            </div>
+            <div className="flex flex-wrap gap-4">
+                {filteredSubscriptions.length > 0 ? (
+                    <FilteredResults />
+                ) : (
+                    <div className="w-fit mx-auto text-center flex flex-col items-center justify-center text-gray-600">
+                        <FaUsers size={40} />
+                        <span>No Subscriptions Found 😫</span>
+                    </div>
+                )}
+            </div>
+        </>
+    );
 };

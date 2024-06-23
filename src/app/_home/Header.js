@@ -56,7 +56,7 @@ const Header = ({ userData }) => {
     return (
         <>
             <header
-                className="flex justify-between items-center px-2 sm:px-4 py-1 bg-white sticky top-0 w-full z-50"
+                className="flex justify-between items-center px-2 sm:px-4 pt-2 py-1 bg-white sticky top-0 w-full z-50"
             >
                 <div className="flex items-center gap-x-4">
                     <Link href="/"

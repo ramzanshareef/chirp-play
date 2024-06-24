@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 export const VideoComp = ({ video }) => {
     return (
         <>
-            <div className="max-w-sm rounded overflow-hidden shadow-lg max-sm:mx-auto"
+            <div className="rounded overflow-hidden shadow-lg"
                 href={`/video/${video._id}`}
             >
                 <div className="relative">

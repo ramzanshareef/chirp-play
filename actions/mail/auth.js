@@ -5,6 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 import Otp from "@root/models/Otp";
 import moment from "moment";
 import connectDB from "../db/connectDB";
+import User from "@root/models/User";
 
 export async function sendEmailForOTP(state, formData) {
     try {
@@ -12,11 +13,15 @@ export async function sendEmailForOTP(state, formData) {
         let name = formData.get("name");
         let username = formData.get("username");
         let password = formData.get("password");
-        if (!email || !name) {
-            return {
-                status: 400,
-                message: "Both Name and Email are required",
-            };
+        if (name === "" || email === "" || password === "" || username === "") {
+            return { status: 400, message: "All fields are required" };
+        }
+        await connectDB();
+        let user = await User.aggregate([
+            { $match: { $or: [{ email: email }, { username: username }] } }
+        ]);
+        if (user.length > 0) {
+            return { status: 400, message: "User already exists" };
         }
         let otp = Math.floor(1000 + Math.random() * 9000);
         const { error } = await resend.emails.send({
@@ -31,7 +36,6 @@ export async function sendEmailForOTP(state, formData) {
                 message: error.message,
             };
         }
-        await connectDB();
         if (await Otp.findOne({ email })) {
             return {
                 status: 400,

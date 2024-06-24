@@ -60,8 +60,8 @@ const SignupForm = () => {
     }, [otpFormState]);
 
     return (
-        <div className="flex">
-            <div className="hidden lg:flex items-center justify-center flex-1 bg-white text-black">
+        <div className="flex h-full items-center sm:justify-between">
+            <div className="hidden lg:flex items-center justify-center bg-white text-black">
                 <div className="max-w-[50%] text-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="524.67004" height="531.39694" className="w-full" alt="https://undraw.co/illustrations" title="https://undraw.co/illustrations" viewBox="0 0 524.67004 531.39694" xmlnsXlink="http://www.w3.org/1999/xlink">
                         <polygon points="117.67523 88.74385 113.67523 109.74385 133.61763 115.36589 131.1398 92.94604 117.67523 88.74385" fill="#a0616a" />
@@ -133,7 +133,7 @@ const SignupForm = () => {
                     </svg>
                 </div>
             </div>
-            <div className="w-full h-screen bg-gray-100 lg:w-1/2">
+            <div className="w-full h-screen sm:bg-gray-100 lg:w-1/2">
                 <div className="flex min-h-full flex-col justify-center">
                     <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                         Create an account
@@ -207,7 +207,7 @@ const SignupForm = () => {
                             <input type="hidden" name="password" value={otpFormState?.password} />
                             <input type="hidden" name="username" value={otpFormState?.username} />
                             <div className="mt-4">
-                                <SubmitButton title="Sign up" size="full"
+                                <SubmitButton title="Sign Up" size="full"
                                     disabled={otp.length !== 4 || !otpValidated}
                                 />
                             </div>

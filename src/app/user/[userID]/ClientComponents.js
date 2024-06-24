@@ -20,6 +20,10 @@ import { addChirp, likeChirp } from "@root/actions/chirp";
 import VideoUpload from "@/app/dashboard/Upload";
 import { IoPlayOutline } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
+import { BiSolidVideos } from "react-icons/bi";
+import { SlSocialTwitter } from "react-icons/sl";
+import { CgPlayList } from "react-icons/cg";
+import { IoSettingsOutline } from "react-icons/io5";
 
 export const SubscribeButton = ({ userID, isSubscribed, isAuth, isCurrentUser }) => {
     return <>
@@ -80,13 +84,21 @@ export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) =>
         renderTabs.push(...["subscribed", "playlist", "settings"]);
     }
 
+    const renderTabsIcons = {
+        videos: <BiSolidVideos size={20} />,
+        chirps: <SlSocialTwitter size={20} />,
+        subscribed: <FaUserCheck size={20} />,
+        playlist: <CgPlayList size={20} />,
+        settings: <IoSettingsOutline size={20} />
+    };
+
     return <>
         <div className="mt-4">
             <div className="flex max-w-full overflow-x-scroll scrollbar-hide">
                 {renderTabs.map((tab, index) => {
                     return <button
                         key={index}
-                        className={`py-2 px-4 overflow-x-scroll scrollbar-hide text-wrap ${activeTab === tab ? "border-b-4 border-b-indigo-600 text-indigo-600 bg-gray-200 rounded-t-lg" : "text-gray-600 hover:border-b-4 hover:border-b-indigo-600 hover:text-indigo-600 hover:bg-gray-200 hover:rounded-t-lg"}`}
+                        className={`py-2 px-4 flex items-center justify-center overflow-x-scroll scrollbar-hide text-wrap ${activeTab === tab ? "border-b-4 border-b-indigo-600 text-indigo-600 bg-gray-200 rounded-t-lg" : "text-gray-600 hover:border-b-4 hover:border-b-indigo-600 hover:text-indigo-600 hover:bg-gray-200 hover:rounded-t-lg"}`}
                         onClick={(e) => {
                             e.preventDefault();
                             router.push(`/user/${userDetails?.user[0]?._id}?tab=${tab}`);
@@ -95,7 +107,8 @@ export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) =>
                             width: `${100 / renderTabs.length}%`
                         }}
                     >
-                        {tab[0].toUpperCase() + tab.slice(1)}
+                        <span className="max-sm:hidden">{tab[0].toUpperCase() + tab.slice(1)}</span>
+                        <span className="hidden max-sm:block">{renderTabsIcons[tab]}</span>
                     </button>;
                 })}
             </div>

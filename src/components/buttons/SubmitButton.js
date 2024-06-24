@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { useFormStatus } from "react-dom";
 
 
-export const SubmitButton = ({ title, size, className }) => {
+export const SubmitButton = ({ title, size, disabled, className }) => {
     const { pending } = useFormStatus();
 
     return (
@@ -16,7 +16,7 @@ export const SubmitButton = ({ title, size, className }) => {
                 ${size === "fit" ? "w-fit" : "w-full"}
                 ${className}
                 `}
-                disabled={pending}
+                disabled={pending === true || disabled === true ? true : false}
             >
                 <div
                     className={` ${pending === true ? "hidden" : ""} `}

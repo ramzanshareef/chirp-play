@@ -41,9 +41,8 @@ export const VideoComp = ({ video }) => {
                     />
                     <div className="flex-1">
                         <div className="font-bold text-sm mb-1">{video.title}</div>
-                        <Link className="text-gray-600 text-xs hover:cursor-pointer -mt-1" href={
-                            `/user/${video.owner._id}`
-                        } >{video.owner.name}</Link>
+                        <Link className="text-gray-600 text-xs hover:text-indigo-400 hover:cursor-pointer -mt-1"
+                            href={`/user/${video.owner._id}`}>{video.owner.name}</Link>
                         <div className="text-gray-600 text-xs">{video.views} views • {moment(video.createdAt).fromNow()}</div>
                     </div>
                 </div>

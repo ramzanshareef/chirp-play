@@ -18,7 +18,7 @@ export const VideoCard = ({ video }) => {
                         alt={video.title}
                         width="1920"
                         height="1080"
-                        className="rounded-lg cursor-pointer"
+                        className="rounded-lg cursor-pointer w-full h-60 object-cover"
                     />
                     <div className="absolute bottom-2 right-2 bg-white text-black bg-opacity-75 text-xs px-2 py-1 rounded">
                         {formatTime(video.duration)}

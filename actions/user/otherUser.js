@@ -35,6 +35,11 @@ export async function getAUserData(userID) {
                             }
                         },
                         {
+                            $sort: {
+                                createdAt: -1
+                            }
+                        },
+                        {
                             $project: {
                                 title: 1,
                                 // description: 1,

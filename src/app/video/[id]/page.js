@@ -13,6 +13,7 @@ import { VideoPlayerComponent } from "./VideoPlayer";
 import { LikeButton, SubscribeButton } from "./ClientComponents";
 import { getSubscribers } from "@root/actions/channel/subscribe";
 import { getLikes } from "@root/actions/like";
+import Link from "next/link";
 
 export default async function VideoPage({ params }) {
     const userDetails = await getUserData();
@@ -46,7 +47,9 @@ export default async function VideoPage({ params }) {
                                     height={40}
                                 />
                                 <div className="ml-4">
-                                    <div className="font-bold">{video.owner.name}</div>
+                                    <Link
+                                        href={`/user/${video.owner._id}`}
+                                        className="font-bold">{video.owner.name}</Link>
                                     <div className="text-gray-600 text-xs">{totalSubscribers + " "}subscribers
                                     </div>
                                 </div>

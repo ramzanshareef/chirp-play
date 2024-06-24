@@ -1,4 +1,5 @@
 "use client";
+
 import { usePathname } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
 
@@ -7,8 +8,8 @@ export default function Loading() {
     return (
         <>
             {pathname === "/" ?
-                <div className="flex flex-wrap gap-4 p-4">
-                    {[...Array(10)].map((_, index) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {[...Array(12)].map((_, index) => (
                         <div key={index} className="w-80 rounded overflow-hidden shadow-lg animate-pulse">
                             <div className="relative">
                                 <div className="w-full h-48 bg-gray-300"></div>
@@ -32,7 +33,6 @@ export default function Loading() {
                     <FaSpinner className="animate-spin text-2xl" />
                 </div>
             }
-
         </>
     );
 };

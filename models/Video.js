@@ -12,7 +12,7 @@ const VideoSchema = new mongoose.Schema({
     },
     thumbnail: {
         type: String,
-        required: true
+        default: "https://res.cloudinary.com/cloudformedia/image/upload/v1719156912/chirp-play/demo-thumbnail-for-videos.png"
     },
     title: {
         type: String,

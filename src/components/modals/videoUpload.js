@@ -11,11 +11,12 @@ import { cancelledModalVideoDelete, videoUpload } from "@root/actions/user/video
 
 export const VideoUploadModal = ({ isOpen, onClose }) => {
     const [openCancelModal, setOpenCancelModal] = useState(false);
-    const [currModal, setCurrModal] = useState(1);
+    const [currModal, setCurrModal] = useState(0);
     const [videoURL, setVideoURL] = useState("");
     const [thumbnailURL, setThumbnailURL] = useState("");
     const [videoLength, setVideoLength] = useState(0);
     const modalsMap = {
+        0: <Modal0 />,
         1: <Modal1
             videoURL={videoURL}
             setVideoURL={setVideoURL}
@@ -60,9 +61,9 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
                                 {currModal === 2 ? <></> :
                                     <button
                                         className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600 max-smw-full w-fit disabled:cursor-not-allowed disabled:bg-green-300 disabled:opacity-50 disabled:hover:bg-green-300"
-                                        disabled={videoURL === ""}
+                                        disabled={currModal === 1 && videoURL === "" ? true : false}
                                         onClick={() => {
-                                            if (videoURL === "") {
+                                            if (currModal === 1 && videoURL === "") {
                                                 toast.error("Please upload a video file");
                                                 return;
                                             }
@@ -78,10 +79,13 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
                         isOpen={openCancelModal}
                         onClose={() => {
                             onClose();
-                            setCurrModal(1);
+                            setCurrModal(0);
                             setOpenCancelModal(false);
                         }}
-                        onCloseWithoutSaving={() => setOpenCancelModal(false)}
+                        onCloseWithoutSaving={() => {
+                            setCurrModal(0);
+                            setOpenCancelModal(false);
+                        }}
                         videoURL={videoURL}
                         thumbnailURL={thumbnailURL}
                         setVideoURL={setVideoURL}
@@ -94,6 +98,21 @@ export const VideoUploadModal = ({ isOpen, onClose }) => {
         </>
     );
 };
+
+function Modal0() {
+    return <>
+        <h2 className="text-2xl font-semibold mb-4">Instruction to Note Before Uploading</h2>
+        <p className="mb-4">Please note the following before uploading your video</p>
+        <ul className="list-disc list-inside">
+            <li>Video file must be in MP4 format</li>
+            <li>Please dont upload adult content, harmful videoes, or videoes that violate the terms of service</li>
+            <li>Thumbnail file must be in SVG, PNG, JPG or GIF format</li>
+            <li>Video file must not exceed 100MB</li>
+            <li>Thumbnail file must not exceed 10MB</li>
+            <li>Video length must not exceed 10 minutes</li>
+        </ul>
+    </>;
+}
 
 function Modal1({ videoURL, setVideoURL, setVideoLength }) {
     return (
@@ -111,6 +130,7 @@ function Modal1({ videoURL, setVideoURL, setVideoLength }) {
                         "resourceType": "video",
                         "folder": "chirp-play",
                         "clientAllowedFormats": "mp4",
+                        "maxFileSize": 100000000, // 100MB
                     }}
                     onError={(error) => {
                         toast.error(error.message);
@@ -119,7 +139,6 @@ function Modal1({ videoURL, setVideoURL, setVideoLength }) {
                         setVideoURL(response.info.secure_url);
                         setVideoLength(response.info.duration);
                     }}
-                    
                 >
                     {({ open }) => {
                         return (
@@ -166,7 +185,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, videoLen
         if (state?.status === 200) {
             toast.success(state?.message, {
                 onClose: () => {
-                    document.getElementById("videoUploadForm").reset();
+                    document.getElementById("videoUploadForm")?.reset();
                     setThumbnailURL("");
                     setVideoURL("");
                     setVideoLength(0);
@@ -195,13 +214,13 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, videoLen
                             "resourceType": "image",
                             "folder": "chirp-play",
                             "clientAllowedFormats": "svg,png,jpg",
+                            "maxFileSize": 10000000, // 10MB
                         }}
                         onError={(error) => {
                             toast.error(error.message);
                         }}
                         onSuccess={(response) => {
                             setThumbnailURL(response.info.secure_url);
-
                         }}
                     >
                         {({ open }) => {
@@ -246,7 +265,7 @@ function Modal2({ thumbnailURL, setThumbnailURL, videoURL, setVideoURL, videoLen
                             <textarea name="description" id="description" className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent" />
                         </div>
                         <input type="text" name="videoURL" id="videoURL" value={videoURL} required hidden />
-                        <input type="text" name="thumbnailURL" id="thumbnailURL" value={thumbnailURL} required hidden />
+                        <input type="text" name="thumbnailURL" id="thumbnailURL" value={thumbnailURL} hidden />
                         <input type="text" name="videoLength" id="videoLength" value={videoLength} required hidden />
                         <SubmitButton title="Publish Video" size="fit" />
                     </form>

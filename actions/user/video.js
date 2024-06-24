@@ -6,8 +6,10 @@ import connectDB from "../db/connectDB";
 import { getUserData } from "./data";
 import { v2 as Cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
-import mongoose from "mongoose";
-import Subscription from "@root/models/Subscription";
+import Like from "@root/models/Like";
+import Comment from "@root/models/Comment";
+import { duration } from "moment";
+import User from "@root/models/User";
 
 Cloudinary.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -21,7 +23,7 @@ export async function videoUpload(currentState, formData) {
     let title = formData.get("title");
     let description = formData.get("description");
     let videoLength = formData.get("videoLength");
-    if (videoFile.length === 0 || title.length === 0 || description.length === 0 || thumbnail.length === 0) {
+    if (videoFile.length === 0 || title.length === 0 || description.length === 0) {
         return { status: 400, message: "All fields are required" };
     }
     else {
@@ -31,14 +33,25 @@ export async function videoUpload(currentState, formData) {
             if (userData.status !== 200) {
                 return { status: 401, message: "Unauthorized" };
             }
-            await Video.create({
-                owner: userData.user._id,
-                videoFile,
-                thumbnail,
-                title,
-                description,
-                duration: parseInt(videoLength)
-            });
+            if (thumbnail.length === 0) {
+                await Video.create({
+                    owner: userData.user._id,
+                    videoFile: videoFile,
+                    title: title,
+                    duration: videoLength,
+                    description: description,
+                });
+            }
+            else {
+                await Video.create({
+                    owner: userData.user._id,
+                    videoFile: videoFile,
+                    title: title,
+                    description: description,
+                    duration: videoLength,
+                    thumbnail: thumbnail,
+                });
+            }
             revalidatePath("/dashboard");
             revalidatePath("/user/" + userData.user._id);
             revalidatePath("/user/" + userData.user._id + "?tab=videos");
@@ -92,114 +105,44 @@ export async function cancelledModalVideoDelete(thumbnailURL, videoURL) {
     }
 }
 
-export async function getUserVideos() {
+export async function deleteVideo(videoID) {
     try {
         await connectDB();
         let userData = await getUserData();
-        if (userData.status !== 200) {
-            return { status: 401, message: "Unauthorized" };
+        let videoToDelete = await Video.findById(videoID);
+        if (!videoToDelete) {
+            return { status: 404, message: "Video not found" };
         }
-        let videos = await Video.aggregate([
-            {
-                $match: {
-                    owner: new mongoose.Types.ObjectId(userData.user._id),
-                },
-            },
-            {
-                $lookup: {
-                    from: "likes",
-                    localField: "_id",
-                    foreignField: "contentID",
-                    as: "likes",
-                },
-            },
-            {
-                $project: {
-                    title: 1,
-                    description: 1,
-                    thumbnail: 1,
-                    views: 1,
-                    createdAt: 1,
-                    duration: 1,
-                    likes: { $size: "$likes" },
-                },
-            },
-        ]);
-        return {
-            status: 200,
-            videos: JSON.parse(JSON.stringify(videos))
-        };
-    }
-    catch (err) {
-        return { status: 500, message: "Internal Server Error " + err.message };
-    }
-}
+        Cloudinary.api.delete_resources(["chirp-play/" + videoToDelete.videoFile.split("/").pop().split(".")[0]], { resource_type: "video" }, (error) => {
+            if (error) {
+                return { status: 500, message: "Internal Server Error " + error.message };
+            }
+        });
+        if (videoToDelete.thumbnail !== "https://res.cloudinary.com/cloudformedia/image/upload/v1719156912/chirp-play/demo-thumbnail-for-videos.png") {
+            Cloudinary.api.delete_resources(["chirp-play/" + videoToDelete.thumbnail.split("/").pop().split(".")[0]], { resource_type: "image" }, (error) => {
+                if (error) {
+                    return { status: 500, message: "Internal Server Error " + error.message };
+                }
+            });
+        }
+        await User.updateMany({}, {
+            $pull: {
+                watchHistory: videoID
+            }
+        });
 
-export async function totalStatsofUser() {
-    try {
-        await connectDB();
-        let userData = await getUserData();
-        if (userData.status !== 200) {
-            return { status: 401, message: "Unauthorized" };
-        }
-        const totalViews = await Video.aggregate([
-            {
-                $match: {
-                    owner: new mongoose.Types.ObjectId(userData.user._id),
-                },
-            },
-            {
-                $group: {
-                    _id: "$owner",
-                    totalViews: { $sum: "$views" },
-                },
-            },
-        ]);
-        const totalLikes = await Video.aggregate([
-            {
-                $match: {
-                    owner: new mongoose.Types.ObjectId(userData.user._id),
-                },
-            },
-            {
-                $lookup: {
-                    from: "likes",
-                    localField: "_id",
-                    foreignField: "contentID",
-                    as: "likes",
-                },
-            },
-            {
-                $project: {
-                    likes: { $size: "$likes" },
-                },
-            },
-            {
-                $group: {
-                    _id: "$owner",
-                    totalLikes: { $sum: "$likes" },
-                },
-            },
-        ]);
-        const totalSubscribers = await Subscription.aggregate([
-            {
-                $match: {
-                    channel: new mongoose.Types.ObjectId(userData.user._id),
-                },
-            },
-            {
-                $group: {
-                    _id: "$channel",
-                    totalSubscribers: { $sum: 1 },
-                },
-            },
-        ]);
-        return {
-            status: 200,
-            totalViews: totalViews[0]?.totalViews || 0,
-            totalLikes: totalLikes[0]?.totalLikes || 0,
-            totalSubscribers: totalSubscribers[0]?.totalSubscribers || 0,
-        };
+        await Video.findByIdAndDelete(videoID);
+        await Like.deleteMany({
+            "contentID": videoID,
+            "onModel": "Video"
+        });
+        await Comment.deleteMany({
+            "video": videoID
+        });
+        revalidatePath("/dashboard");
+        revalidatePath("/user/" + userData?.user?._id);
+        revalidatePath("/user/" + userData?.user?._id + "?tab=videos");
+        return { status: 200, message: "Video Deleted Successfully" };
     }
     catch (err) {
         return { status: 500, message: "Internal Server Error " + err.message };

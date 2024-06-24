@@ -11,10 +11,42 @@ import { getUserData } from "./user/data";
 export const getAllVideos = async () => {
     try {
         await connectDB();
-        const videos = await Video.find({}).populate("owner", "name username avatar coverImage");
+        const videos = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "owner"
+                }
+            },
+            {
+                $unwind: "$owner"
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    duration: 1,
+                    views: 1,
+                    createdAt: 1,
+                    thumbnail: 1,
+                    owner: {
+                        _id: 1,
+                        name: 1,
+                        avatar: 1
+                    }
+                }
+            }
+        ]);
         return {
             status: 200,
-            videos: JSON.parse(JSON.stringify(videos))
+            videos: JSON.parse(JSON.stringify(
+                [...videos, ...videos, ...videos, ...videos, ...videos, ...videos, ...videos, ...videos, ...videos, ...videos] // to simulate more videos
+            ))
         };
     }
     catch (error) {

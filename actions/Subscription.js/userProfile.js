@@ -5,7 +5,7 @@ import connectDB from "../db/connectDB";
 import { getUserData } from "../user/data";
 import { revalidatePath } from "next/cache";
 
-export async function subscribeHandlerToUser(userID) {
+export async function subscribeHandlerToUser(userID, pathToRevalidate) {
     try {
         await connectDB();
         let userData = await getUserData();
@@ -26,6 +26,7 @@ export async function subscribeHandlerToUser(userID) {
             });
             revalidatePath("/dashboard");
             revalidatePath(`/user/${userID}`);
+            revalidatePath(pathToRevalidate);
             return { status: 200, message: "Unsubscribed Successfully 😞" };
         }
         await Subscription.create({
@@ -34,6 +35,7 @@ export async function subscribeHandlerToUser(userID) {
         });
         revalidatePath("/dashboard");
         revalidatePath(`/user/${userID}`);
+        revalidatePath(pathToRevalidate);
         return { status: 200, message: "Subscribed Successfully 😊" };
     }
     catch (err) {

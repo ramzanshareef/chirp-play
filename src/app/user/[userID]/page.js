@@ -39,6 +39,7 @@ export default async function UserPage({ params, searchParams }) {
                     isSubscribed={userDetails?.user[0]?.isSubscribed}
                     isAuth={userDetails?.isAuth}
                     isCurrentUser={userDetails?.isCurrentUser}
+                    pathToRevalidate={`/user/${params?.userID}`}
                 />
             </div>
             <ContentBox

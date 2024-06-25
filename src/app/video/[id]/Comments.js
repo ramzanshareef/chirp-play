@@ -94,10 +94,7 @@ export const Comments = ({ comments }) => {
                                     onClick={async (e) => {
                                         e.preventDefault();
                                         let res = await likeCommentHandler(comment._id);
-                                        if (res?.status === 200) {
-                                            toast.success(res.message);
-                                        }
-                                        else {
+                                        if (res?.status !== 200) {
                                             toast.error(res.message);
                                         }
                                     }}
@@ -107,10 +104,7 @@ export const Comments = ({ comments }) => {
                                     onClick={async (e) => {
                                         e.preventDefault();
                                         let res = await likeCommentHandler(comment._id);
-                                        if (res?.status === 200) {
-                                            toast.success(res.message);
-                                        }
-                                        else {
+                                        if (res?.status !== 200) {
                                             toast.error(res.message);
                                         }
                                     }}
@@ -162,10 +156,7 @@ const DeleteCommentConfimationModal = ({ isOpen, onClose, commentToDelete }) => 
                                         e.preventDefault();
                                         let deleteResponse = await deleteComment(commentToDelete._id);
                                         if (deleteResponse.status === 200) {
-                                            toast.success(deleteResponse.message, {
-                                                onClick: () => onClose(),
-                                                onClose: () => onClose(),
-                                            });
+                                            onClose();
                                         }
                                         else {
                                             toast.error(deleteResponse.message, {
@@ -201,10 +192,7 @@ const EditCommentModal = ({ isOpen, onClose, commentToEdit }) => {
 
     useEffect(() => {
         if (state?.status === 200) {
-            toast.success(state.message, {
-                onClick: () => onClose(),
-                onClose: () => onClose()
-            });
+            onClose();
         }
         else if (state?.status !== 200 && state?.message) {
             toast.error(state.message);
@@ -263,12 +251,9 @@ export const CommentsForm = ({ videoID }) => {
 
     useEffect(() => {
         if (state?.status === 200) {
-            toast.success(state.message, {
-                onClick: () => document.getElementById("commentForm").reset(),
-                onClose: () => document.getElementById("commentForm").reset()
-            });
+            document.getElementById("commentForm").reset();
         }
-        else if (state?.status !== 200 && state?.message) {
+        if (state?.status !== 200 && state?.message) {
             toast.error(state.message);
         }
     }, [state]);

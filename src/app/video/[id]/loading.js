@@ -7,7 +7,7 @@ const loading = () => {
     return (
         <>
             <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col w-full md:w-[70%] p-4">
+                <div className="flex flex-col w-full md:w-[70%] sm:px-4">
                     {/* video player */}
                     <div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg"></div>
 

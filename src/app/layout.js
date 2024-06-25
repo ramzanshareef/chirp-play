@@ -7,7 +7,6 @@ import { getUserData } from "@root/actions/user/data";
 import { Suspense } from "react";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "./_home/Footer";
-import Loader from "@/components/loader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,18 +42,19 @@ export default async function RootLayout({ children }) {
                         limit={5}
                         newestOnTop={true}
                         className="z-max"
+                        theme="colored"
                     />
-                    <Suspense fallback={<Loader />} >
+                    <SidebarWithSuspense>
                         <SidebarWithSuspense />
-                    </Suspense>
+                    </SidebarWithSuspense>
                     <div className="w-full flex flex-col">
-                        <Suspense fallback={<Loader />} >
+                        <Suspense>
                             <HeaderWithSuspense />
                         </Suspense>
                         <div className="px-4 py-2 pb-20 sm:py-5 sm:px-20 overflow-y-scroll scrollbar-hide">
                             {children}
                         </div>
-                        <Suspense fallback={<Loader />} >
+                        <Suspense>
                             <FooterWithSuspense />
                         </Suspense>
                     </div>

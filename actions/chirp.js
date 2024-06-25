@@ -93,3 +93,50 @@ export async function likeChirpHandler(chirpID) {
         return { status: 500, message: "Internal Server Error " + error.message };
     }
 }
+
+export async function deleteChirp(chirpID) {
+    try {
+        await connectDB();
+        let userData = await getUserData();
+        if (userData.status !== 200) {
+            return { status: 401, message: "Please Login to delete a Chirp" };
+        }
+        let chirp = await Chirp.findById(chirpID).populate("owner").select("-password");
+        if (!chirp) {
+            return { status: 404, message: "Chirp not found" };
+        }
+        if (chirp.owner._id.toString() !== userData.user._id) {
+            return { status: 401, message: "Unauthorized" };
+        }
+        await Chirp.findByIdAndDelete(chirpID);
+        await Like.deleteMany({ contentID: chirpID, onModel: "Chirp" });
+        revalidatePath("/user/" + userData.user._id + "?tab=chirps");
+        return { status: 200, message: "Chirp Deleted Successfully" };
+    }
+    catch (error) {
+        return { status: 500, message: "Internal Server Error " + error.message };
+    }
+}
+
+export async function editChirp(currentState, fomrData) {
+    try {
+        await connectDB();
+        let userData = await getUserData();
+        if (userData.status !== 200) {
+            return { status: 401, message: "Please Login to edit a Chirp" };
+        }
+        let chirp = await Chirp.findById(fomrData.get("chirpID")).populate("owner").select("-password");
+        if (!chirp) {
+            return { status: 404, message: "Chirp not found" };
+        }
+        if (chirp.owner._id.toString() !== userData.user._id) {
+            return { status: 401, message: "Unauthorized" };
+        }
+        await Chirp.findByIdAndUpdate(fomrData.get("chirpID"), { content: fomrData.get("chirpContent") });
+        revalidatePath("/user/" + userData.user._id + "?tab=chirps");
+        return { status: 200, message: "Chirp Edited Successfully" };
+    }
+    catch (error) {
+        return { status: 500, message: "Internal Server Error " + error.message };
+    }
+}

@@ -23,7 +23,7 @@ export default async function VideoPage({ params }) {
     return (
         <>
             <div className="flex flex-col md:flex-row">
-                <div className="flex flex-col w-full md:w-[70%] p-4">
+                <div className="flex flex-col w-full md:w-[70%] sm:p-4">
 
                     {/* video player */}
                     <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg"></div>}>
@@ -58,6 +58,7 @@ export default async function VideoPage({ params }) {
                                         isSubscribed={video?.isSub}
                                         isAuth={isAuth}
                                         isCurrentUser={userDetails?.user?._id === video?.owner?._id}
+                                        pathToRevalidate={`/video/${video?._id}`}
                                     />
                                 </div>
                             </div>

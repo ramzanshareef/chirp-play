@@ -14,9 +14,9 @@ import { FiTwitter } from "react-icons/fi";
 import { FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { redirect, useRouter } from "next/navigation";
-import { IoMdHeartEmpty } from "react-icons/io";
+import { IoIosCloseCircleOutline, IoMdHeartEmpty } from "react-icons/io";
 import { FcLike } from "react-icons/fc";
-import { addChirp, likeChirpHandler } from "@root/actions/chirp";
+import { addChirp, deleteChirp, editChirp, likeChirpHandler } from "@root/actions/chirp";
 import VideoUpload from "@/app/dashboard/Upload";
 import { IoPlayOutline } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
@@ -24,6 +24,8 @@ import { BiSolidVideos } from "react-icons/bi";
 import { SlSocialTwitter } from "react-icons/sl";
 import { CgPlayList } from "react-icons/cg";
 import { IoSettingsOutline } from "react-icons/io5";
+import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
+import { TbEdit } from "react-icons/tb";
 
 export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) => {
     const router = useRouter();
@@ -146,18 +148,18 @@ const VideoContent = ({ videos, isCurrentUser }) => {
 
 const ChirpsContent = ({ userDetails, isCurrentUser }) => {
     const [state, formAction] = useActionState(addChirp, null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [chirpToDelete, setChirpToDelete] = useState({});
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [commentToEdit, setCommentToEdit] = useState({});
 
     const [optimisticChirps, setOptimisticChirps] = useOptimistic(userDetails?.user[0]?.chirps,
         (newChirp) => [newChirp, ...chirps]
     );
 
     useEffect(() => {
-        if (state?.status === 200) {
-            toast.success(state.message);
-            document.getElementById("chirpsForm").reset();
-        }
-        else if (state?.status === 500) {
-            toast.error(state.message);
+        if (state?.status !== 200 && state?.message) {
+            toast.error(state?.message);
         }
     }, [state]);
 
@@ -196,9 +198,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                 </form>
             </div>
 
-            <div
-                className="flex flex-col gap-y-4 mt-4"
-            >
+            <div className="flex flex-col gap-y-4 mt-4">
                 {optimisticChirps?.map((chirp) => (
                     <div key={chirp._id} className="flex flex-row gap-x-4 border-b border-gray-200 pb-4">
                         <Image
@@ -217,17 +217,27 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                     </div>
                                 </div>
 
-                                {/*  TODO: Edit and Delete functionality */}
-                                {/* <div className={`items-center gap-x-2  ${username === comment.owner.username ? "flex" : "hidden"} `}>
+                                <div className="flex items-center gap-x-2">
                                     <MdDelete
                                         size={20}
                                         className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setChirpToDelete(chirp);
+                                            setShowDeleteModal(true);
+                                        }}
                                     />
                                     <TbEdit
                                         size={20}
                                         className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setCommentToEdit(chirp);
+                                            setShowEditModal(true);
+                                        }}
                                     />
-                                </div> */}
+                                </div>
+
                             </div>
                             <p>
                                 {chirp.content}
@@ -238,10 +248,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                         onClick={async (e) => {
                                             e.preventDefault();
                                             let res = await likeChirpHandler(chirp._id);
-                                            if (res.status === 200) {
-                                                toast(res.message);
-                                            }
-                                            else {
+                                            if (res.status !== 200) {
                                                 toast.error(res.message);
                                             }
                                         }}
@@ -250,10 +257,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                         onClick={async (e) => {
                                             e.preventDefault();
                                             let res = await likeChirpHandler(chirp._id);
-                                            if (res.status === 200) {
-                                                toast.success(res.message);
-                                            }
-                                            else {
+                                            if (res.status !== 200) {
                                                 toast.error(res.message);
                                             }
                                         }}
@@ -273,6 +277,132 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                         </span>
                     </div>}
             </div>
+            <DeleteChirpConfimationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                chirpToDelete={chirpToDelete}
+            />
+            <EditChirpModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                chirpToEdit={commentToEdit}
+            />
+        </>
+    );
+};
+
+const DeleteChirpConfimationModal = ({ isOpen, onClose, chirpToDelete }) => {
+    return (
+        <>
+            {(isOpen === true)
+                ?
+                <>
+                    <div className="fixed z-50 inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+                        <div className="w-4/5 lg:w-2/5 mx-auto p-6 bg-white shadow-md rounded-xl overflow-y-auto max-h-screen">
+                            <h2 className="text-2xl font-semibold mb-4">
+                                <IoIosCloseCircleOutline
+                                    onClick={onClose}
+                                    className="cursor-pointer float-right"
+                                />
+                            </h2>
+                            <div>
+                                Are you sure you want to delete the chirp &quot;<b>{chirpToDelete.content}</b>&quot;?
+                                <span>
+                                    This action cannot be undone, and this will <span className="text-red-600">permenantly</span> delete the chirp.
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center mt-4">
+                                <button className="bg-red-500 hover:bg-red-700 text-white p-2 rounded"
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        let deleteResponse = await deleteChirp(chirpToDelete._id);
+                                        if (deleteResponse.status === 200) {
+                                            onClose();
+                                        }
+                                        else {
+                                            toast.error(deleteResponse.message, {
+                                                onClick: () => onClose(),
+                                                onClose: () => onClose(),
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Yes
+                                </button>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onClose();
+                                    }}
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+                :
+                <></>
+            }
+        </>
+    );
+};
+
+const EditChirpModal = ({ isOpen, onClose, chirpToEdit }) => {
+    const [state, formAction] = useActionState(editChirp, null);
+
+    useEffect(() => {
+        if (state?.status === 200) {
+            onClose();
+        }
+        else if (state?.status !== 200 && state?.message) {
+            toast.error(state.message);
+        }
+    }, [state]);
+
+    return (
+        <>
+            {(isOpen === true)
+                ?
+                <>
+                    <div className="fixed z-50 inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+                        <div className="w-4/5 lg:w-2/5 mx-auto p-6 bg-white shadow-md rounded-xl overflow-y-auto max-h-screen">
+                            <h2 className="text-2xl font-semibold mb-4">
+                                Edit Chirp
+                                <IoIosCloseCircleOutline
+                                    onClick={onClose}
+                                    className="cursor-pointer float-right"
+                                />
+                            </h2>
+                            <div>
+                                <form action={formAction} className="w-full">
+                                    <textarea
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent"
+                                        placeholder="Edit your Chirp..."
+                                        name="chirpContent"
+                                        required
+                                        minLength={5}
+                                        defaultValue={chirpToEdit.content}
+                                    />
+                                    <input type="hidden" name="chirpID" value={chirpToEdit._id} />
+                                    <SubmitButton
+                                        title={
+                                            <>
+                                                <MdOutlineInsertComment size={20} className="mr-2 sm:hidden" />
+                                                <span className="max-sm:hidden">Save</span>
+                                            </>
+                                        }
+                                        size="fit"
+                                        className="ml-auto mt-2"
+                                    />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </>
+                :
+                <></>
+            }
         </>
     );
 };
@@ -328,10 +458,8 @@ const SubrscribedContent = ({ userDetails }) => {
                         className="flex items-center gap-2 rounded-md py-2 px-4 text-white hover:bg-red-700 bg-red-600"
                         onClick={async (e) => {
                             e.preventDefault();
-                            let res = await subscribeHandlerToUser(sub._id);
-                            if (res.status === 200) {
-                                toast.success(res.message);
-                            } else {
+                            let res = await subscribeHandlerToUser(sub._id, "/" + userDetails.user[0]._id);
+                            if (res.status !== 200) {
                                 toast.error(res.message);
                             }
                         }}

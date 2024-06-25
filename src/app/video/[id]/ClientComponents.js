@@ -1,7 +1,7 @@
 "use client";
 
 import { subscribeHandlerToChannel, subscriptionStatus } from "@root/actions/channel/subscribe";
-import { likeHandler, likeStatus } from "@root/actions/like";
+import { likeHandler } from "@root/actions/like";
 import { useEffect, useState } from "react";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
 import { FaRegBell, FaBell } from "react-icons/fa6";
@@ -58,18 +58,7 @@ export const SubscribeButton = ({ channelID, videoID }) => {
     );
 };
 
-export const LikeButton = ({ videoID, totalLikes }) => {
-    const [likerStatus, setLikerStatus] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            let res = await likeStatus(videoID);
-            if (res.status === 200) {
-                setLikerStatus(res.isLiked);
-            }
-        })();
-    }, [videoID]);
-
+export const LikeButton = ({ videoID, totalLikes, isLikedByCurrUser }) => {
     return (
         <>
             <button
@@ -79,18 +68,14 @@ export const LikeButton = ({ videoID, totalLikes }) => {
                     e.preventDefault();
                     let res = await likeHandler(videoID, "Video");
                     if (res.status === 200) {
-                        toast.success(res.message, {
-                            onClick: setLikerStatus(!likerStatus),
-                            onClose: setLikerStatus(!likerStatus),
-                        });
+                        toast.success(res.message);
                     }
                     else {
-                        toast.error(res.message, {
-                        });
+                        toast.error(res.message);
                     }
                 }}
             >
-                {likerStatus === false ?
+                {isLikedByCurrUser === false ?
                     <>
                         <AiOutlineLike size={20} className="inline-block mx-1" />
                         {totalLikes}

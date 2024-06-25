@@ -64,7 +64,7 @@ export async function addChirp(currentState, formData) {
     }
 }
 
-export async function likeChirp(chirpID) {
+export async function likeChirpHandler(chirpID) {
     try {
         await connectDB();
         let userData = await getUserData();

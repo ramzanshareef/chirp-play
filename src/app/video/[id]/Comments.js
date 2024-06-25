@@ -1,18 +1,22 @@
 "use client";
 
 import { SubmitButton } from "@/components/buttons/SubmitButton";
-import { addComment } from "@root/actions/comment";
+import { addComment, deleteComment, likeCommentHandler } from "@root/actions/comment";
 import moment from "moment";
 import Image from "next/image";
 import { useState, useEffect, useActionState } from "react";
 import { TbEdit } from "react-icons/tb";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { IoIosCloseCircleOutline, IoMdHeartEmpty } from "react-icons/io";
+import { FcLike } from "react-icons/fc";
 
-export const Comments = ({ comments, username }) => {
+export const Comments = ({ comments }) => {
     const [showComments, setShowComments] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState({});
 
     useEffect(() => {
         const handleResize = () => {
@@ -56,10 +60,15 @@ export const Comments = ({ comments, username }) => {
                                 <span className="font-bold">{comment.owner.name}</span>
                                 <div className="text-gray-600 text-xs ml-2">{moment(comment.createdAt).fromNow()}</div>
                             </div>
-                            <div className={`items-center gap-x-2  ${username === comment.owner.username ? "flex" : "hidden"} `}>
+                            <div className={`items-center gap-x-2  ${comment?.isCurrUserOwnerOfComment ? "flex" : "hidden"} `}>
                                 <MdDelete
                                     size={20}
                                     className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setCommentToDelete(comment);
+                                        setShowDeleteModal(true);
+                                    }}
                                 />
                                 <TbEdit
                                     size={20}
@@ -68,12 +77,108 @@ export const Comments = ({ comments, username }) => {
                             </div>
                         </div>
                         <Link
-                            href={`/user/${comment.owner.username}`}
+                            href={`/user/${comment?.owner?._id}`}
                             className="text-gray-600 hover:text-gray-800 text-sm -mt-1 mb-1">@{comment.owner.username}</Link>
                         <div>{comment.content}</div>
+                        <div className="flex flex-row gap-x-2 items-center">
+                            {comment?.isLikedByCurrUser ?
+                                <FcLike size={20} className="text-gray-400 cursor-pointer"
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        let res = await likeCommentHandler(comment._id);
+                                        if (res?.status === 200) {
+                                            toast.success(res.message);
+                                        }
+                                        else {
+                                            toast.error(res.message);
+                                        }
+                                    }}
+                                />
+                                :
+                                <IoMdHeartEmpty size={20} className="text-gray-400 cursor-pointer"
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        let res = await likeCommentHandler(comment._id);
+                                        if (res?.status === 200) {
+                                            toast.success(res.message);
+                                        }
+                                        else {
+                                            toast.error(res.message);
+                                        }
+                                    }}
+                                />
+                            }
+                            <span className="text-gray-600">{comment.totalLikes}</span>
+                        </div>
                     </div>
                 </div>
             ))}
+            <DeleteCommentConfimationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                commentToDelete={commentToDelete}
+            />
+        </>
+    );
+};
+
+export const DeleteCommentConfimationModal = ({ isOpen, onClose, commentToDelete }) => {
+    return (
+        <>
+            {(isOpen === true)
+                ?
+                <>
+                    <div className="fixed z-50 inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+                        <div className="w-4/5 lg:w-2/5 mx-auto p-6 bg-white shadow-md rounded-xl overflow-y-auto max-h-screen">
+                            <h2 className="text-2xl font-semibold mb-4">
+                                <IoIosCloseCircleOutline
+                                    onClick={onClose}
+                                    className="cursor-pointer float-right"
+                                />
+                            </h2>
+                            <div>
+                                Are you sure you want to delete the comment
+                                <span className="font-bold">&nbsp; &quot;{commentToDelete.content}&quot; &nbsp;</span>?
+                                <span>
+                                    This action cannot be undone, and this will <span className="text-red-600">permenantly</span> delete the comment.
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center mt-4">
+                                <button className="bg-red-500 hover:bg-red-700 text-white p-2 rounded"
+                                    onClick={async (e) => {
+                                        e.preventDefault();
+                                        let deleteResponse = await deleteComment(commentToDelete._id);
+                                        if (deleteResponse.status === 200) {
+                                            toast.success(deleteResponse.message, {
+                                                onClick: () => onClose(),
+                                                onClose: () => onClose(),
+                                            });
+                                        }
+                                        else {
+                                            toast.error(deleteResponse.message, {
+                                                onClick: () => onClose(),
+                                                onClose: () => onClose(),
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Yes
+                                </button>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onClose();
+                                    }}
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+                :
+                <></>
+            }
         </>
     );
 };
@@ -106,7 +211,12 @@ export const CommentsForm = ({ videoID }) => {
                     />
                     <input type="hidden" name="videoID" value={videoID} />
                     <SubmitButton
-                        title="Comment"
+                        title={
+                            <>
+                                <MdOutlineInsertComment size={20} className="mr-2 sm:hidden" />
+                                <span className="max-sm:hidden">Comment</span>
+                            </>
+                        }
                         size="fit"
                         className="ml-auto mt-2"
                     />

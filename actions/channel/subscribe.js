@@ -59,24 +59,3 @@ export async function subscriptionStatus(channelID) {
         return { status: 500, message: "Internal Server Error " + err.message };
     }
 }
-
-export async function getSubscribers(channelID) {
-    try {
-        await connectDB();
-        const totalSubscribers = await Subscription.aggregate([
-            {
-                $match: {
-                    channel: new mongoose.Types.ObjectId(channelID)
-                }
-            },
-            { $count: "total" }
-        ]);
-        return {
-            status: 200,
-            totalSubscribers: totalSubscribers[0]?.total || 0
-        };
-    }
-    catch (error) {
-        return { status: 500, message: error.message };
-    }
-}

@@ -2,7 +2,6 @@
 
 import connectDB from "@root/actions/db/connectDB";
 import mongoose from "mongoose";
-import Comment from "@root/models/Comment";
 import Video from "@root/models/Video";
 import User from "@root/models/User";
 import { revalidatePath } from "next/cache";
@@ -54,45 +53,187 @@ export const getAllVideos = async () => {
     }
 };
 
-export const getVideo = async (videoId) => {
+export const getVideoData = async (videoId) => {
     try {
         await connectDB();
-        const video = await Video.findById(videoId).populate("owner", "name username avatar coverImage");
-        const comments = await Comment.aggregate([
+        const currUser = (await getUserData()).user?._id;
+        const videoData = await Video.aggregate([
             {
-                $match: { video: new mongoose.Types.ObjectId(videoId) }
+                $match: {
+                    _id: new mongoose.Types.ObjectId(videoId)
+                }
             },
             {
                 $lookup: {
                     from: "users",
                     localField: "owner",
                     foreignField: "_id",
-                    as: "owner"
+                    as: "owner",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "subscriptions",
+                                localField: "_id",
+                                foreignField: "channel",
+                                as: "subscribers",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                totalSubscribers: {
+                                    $size: {
+                                        $ifNull: ["$subscribers", []]
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                isSub: {
+                                    $in: [new mongoose.Types.ObjectId(currUser), "$subscribers.subscriber"]
+                                }
+                            }
+                        }
+                    ]
                 }
             },
             {
-                $unwind: "$owner"
+                $addFields: {
+                    isSub: {
+                        $arrayElemAt: ["$owner.isSub", 0]
+                    },
+                }
             },
             {
-                $sort: { createdAt: -1 }
+                $addFields: {
+                    owner: {
+                        $arrayElemAt: ["$owner", 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "contentID",
+                    as: "likes",
+                }
+            },
+            {
+                $addFields: {
+                    totalLikes: {
+                        $size: {
+                            $ifNull: ["$likes", []]
+                        }
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    isLikedByCurrUser: {
+                        $in: [new mongoose.Types.ObjectId(currUser), "$likes.likedBy"]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "video",
+                    as: "comments",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            name: 1,
+                                            username: 1,
+                                            avatar: 1
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            $addFields: {
+                                isCurrUserOwnerOfComment: {
+                                    $in: [new mongoose.Types.ObjectId(currUser), "$owner._id"]
+                                }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: "likes",
+                                localField: "_id",
+                                foreignField: "contentID",
+                                as: "likes",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                totalLikes: {
+                                    $size: {
+                                        $ifNull: ["$likes", []]
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                isLikedByCurrUser: {
+                                    $in: [new mongoose.Types.ObjectId(currUser), "$likes.likedBy"]
+                                }
+                            }
+                        },
+                        {
+                            $sort: { createdAt: -1 }
+                        },
+                        {
+                            $project: {
+                                owner: {
+                                    $arrayElemAt: ["$owner", 0]
+                                },
+                                content: 1,
+                                createdAt: 1,
+                                isCurrUserOwnerOfComment: 1,
+                                totalLikes: 1,
+                                isLikedByCurrUser: 1
+                            }
+                        }
+                    ]
+                }
             },
             {
                 $project: {
-                    _id: 1,
-                    content: 1,
+                    title: 1,
+                    description: 1,
+                    thumbnail: 1,
+                    videoFile: 1,
+                    views: 1,
+                    duration: 1,
                     createdAt: 1,
                     owner: {
+                        _id: 1,
                         name: 1,
-                        username: 1,
-                        avatar: 1
-                    }
+                        avatar: 1,
+                        totalSubscribers: 1
+                    },
+                    isSub: 1,
+                    totalLikes: 1,
+                    isLikedByCurrUser: 1,
+                    comments: 1
                 }
             }
         ]);
         return {
             status: 200,
-            video: JSON.parse(JSON.stringify(video)),
-            comments: JSON.parse(JSON.stringify(comments))
+            video: JSON.parse(JSON.stringify(videoData[0])),
         };
     }
     catch (error) {

@@ -1,6 +1,7 @@
 import { getAUserData } from "@root/actions/user/otherUser";
 import Image from "next/image";
-import { ContentBox, SubscribeButton } from "./ClientComponents";
+import { ContentBox } from "./ClientComponents";
+import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import { Suspense } from "react";
 import moment from "moment";
 

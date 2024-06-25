@@ -15,3 +15,8 @@ export const getSession = async () => {
     });
     return session;
 };
+
+export const isAuthenticated = async () => {
+    const session = await getSession();
+    return session?.isAuth || false;
+};

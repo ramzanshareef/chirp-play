@@ -1,25 +1,21 @@
 /* eslint-disable no-unused-vars */
-import { VideoComp } from "@/components/Video";
+import { VideoComp, VideoPlayer } from "@/components/Video";
 import { getUserData } from "@root/actions/user/data";
-import { getVideo, suggestedVideos } from "@root/actions/video";
+import { getVideoData, suggestedVideos } from "@root/actions/video";
 import moment from "moment";
 import Image from "next/image";
-import { AiOutlineLike } from "react-icons/ai";
-import { FaRegBell } from "react-icons/fa";
 import { MdPlaylistAdd, MdPlaylistAddCheck } from "react-icons/md";
 import { Comments, CommentsForm } from "./Comments";
 import { Suspense } from "react";
-import { VideoPlayerComponent } from "./VideoPlayer";
-import { LikeButton, SubscribeButton } from "./ClientComponents";
-import { getSubscribers } from "@root/actions/channel/subscribe";
-import { getLikes } from "@root/actions/like";
+import { LikeButton } from "./ClientComponents";
+import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import Link from "next/link";
+import { isAuthenticated } from "@root/utils/session";
 
 export default async function VideoPage({ params }) {
+    const isAuth = await isAuthenticated();
     const userDetails = await getUserData();
-    const { video, comments } = await getVideo(params.id);
-    const { totalSubscribers } = await getSubscribers(video.owner._id);
-    const { totalLikes } = await getLikes(video._id);
+    const { video } = await getVideoData(params.id);
     const suggestedVideosData = await suggestedVideos(params.id);
     return (
         <>
@@ -28,7 +24,7 @@ export default async function VideoPage({ params }) {
 
                     {/* video player */}
                     <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 w-full rounded-lg"></div>}>
-                        <VideoPlayerComponent videoID={params?.id} />
+                        <VideoPlayer video={video} />
                     </Suspense>
 
                     {/* video details */}
@@ -37,31 +33,36 @@ export default async function VideoPage({ params }) {
                             <h4>{video.title}</h4>
                             <p className="text-gray-600 text-xs">{video.views} views • {moment(video.createdAt).fromNow()}</p>
                         </div>
-                        <div className="flex flex-col-reverse gap-y-3 sm:flex-row sm:justify-between sm:items-center">
-                            <div className="flex flex-row">
+                        <div className="flex flex-col-reverse max-lg:gap-y-3 lg:flex-row lg:justify-between">
+                            <div className="flex flex-row gap-x-4">
                                 <Image
-                                    src={video.owner.avatar}
-                                    alt={video.owner.name}
+                                    src={video?.owner?.avatar}
+                                    alt={video?.owner?.name}
                                     className="w-10 h-10 rounded-full"
                                     width={40}
                                     height={40}
                                 />
-                                <div className="ml-4">
+                                <div>
                                     <Link
-                                        href={`/user/${video.owner._id}`}
-                                        className="font-bold">{video.owner.name}</Link>
-                                    <div className="text-gray-600 text-xs">{totalSubscribers + " "}subscribers
+                                        href={`/user/${video?.owner?._id}`}
+                                        className="font-bold">{video?.owner?.name}</Link>
+                                    <div className="text-gray-600 text-xs">{video?.owner?.totalSubscribers + " "}subscribers
                                     </div>
                                 </div>
-                                <SubscribeButton
-                                    channelID={video.owner._id}
-                                    videoID={video._id}
-                                />
+                                <div>
+                                    <SubscribeButton
+                                        userID={video?.owner?._id}
+                                        isSubscribed={video?.isSub}
+                                        isAuth={isAuth}
+                                        isCurrentUser={userDetails?.user?._id === video?.owner?._id}
+                                    />
+                                </div>
                             </div>
                             <div className="flex">
                                 <LikeButton
                                     videoID={video._id}
-                                    totalLikes={totalLikes}
+                                    totalLikes={video?.totalLikes}
+                                    isLikedByCurrUser={video?.isLikedByCurrUser}
                                 />
                                 <button
                                     className="items-center gap-x-2 flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
@@ -79,7 +80,7 @@ export default async function VideoPage({ params }) {
                     <div className="flex flex-col gap-y-4 p-4">
 
                         {/* comment form */}
-                        {userDetails?.status === 200 ?
+                        {isAuth ?
                             (<div className="flex flex-row gap-x-4">
                                 <Image
                                     src={userDetails?.user?.avatar}
@@ -104,7 +105,7 @@ export default async function VideoPage({ params }) {
                                         <textarea
                                             className="w-full p-2 border border-gray-200 rounded-lg
                                             disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-600"
-                                            placeholder="Sign in to comment"
+                                            placeholder="Sign in to Comment"
                                             disabled
                                         />
                                     </div>
@@ -113,8 +114,7 @@ export default async function VideoPage({ params }) {
 
                         {/* Existing Comments */}
                         <Comments
-                            comments={comments}
-                            username={userDetails?.user?.username}
+                            comments={video?.comments}
                         />
                     </div>
                 </div>

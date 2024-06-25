@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { FcLike } from "react-icons/fc";
-import { addChirp, likeChirp } from "@root/actions/chirp";
+import { addChirp, likeChirpHandler } from "@root/actions/chirp";
 import VideoUpload from "@/app/dashboard/Upload";
 import { IoPlayOutline } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
@@ -24,34 +24,6 @@ import { BiSolidVideos } from "react-icons/bi";
 import { SlSocialTwitter } from "react-icons/sl";
 import { CgPlayList } from "react-icons/cg";
 import { IoSettingsOutline } from "react-icons/io5";
-
-export const SubscribeButton = ({ userID, isSubscribed, isAuth, isCurrentUser }) => {
-    return <>
-        <button className={` flex items-center gap-2 rounded-md py-2 px-4 text-white 
-        ${isCurrentUser && "hidden"}  
-        ${isAuth && isSubscribed ? "bg-indigo-600 hover:bg-indigo-700" : "hover:bg-red-700 bg-red-600"} `}
-            onClick={async (e) => {
-                e.preventDefault();
-                if (!isAuth) {
-                    toast.error("Please Login to Subscribe");
-                    return;
-                }
-                let res = await subscribeHandlerToUser(userID);
-                if (res.status === 200) {
-                    toast.success(res.message);
-                }
-                else {
-                    toast.error(res.message);
-                }
-            }}
-        >
-            {isSubscribed ? <FaUserCheck size={20} /> : <FaUserPlus size={20} />}
-            <span className="hidden sm:block">
-                {isSubscribed ? "Subscribed" : "Subscribe"}
-            </span>
-        </button>
-    </>;
-};
 
 export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) => {
     const router = useRouter();
@@ -265,7 +237,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                     ? <FcLike size={20} className="cursor-pointer"
                                         onClick={async (e) => {
                                             e.preventDefault();
-                                            let res = await likeChirp(chirp._id);
+                                            let res = await likeChirpHandler(chirp._id);
                                             if (res.status === 200) {
                                                 toast(res.message);
                                             }
@@ -277,7 +249,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                     <IoMdHeartEmpty size={20} className="cursor-pointer"
                                         onClick={async (e) => {
                                             e.preventDefault();
-                                            let res = await likeChirp(chirp._id);
+                                            let res = await likeChirpHandler(chirp._id);
                                             if (res.status === 200) {
                                                 toast.success(res.message);
                                             }

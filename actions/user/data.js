@@ -5,6 +5,15 @@ import Like from "@root/models/Like";
 import User from "@root/models/User";
 import { getSession } from "@root/utils/session";
 import mongoose from "mongoose";
+import { v2 as Cloudinary } from "cloudinary";
+import { revalidatePath } from "next/cache";
+
+Cloudinary.config({
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 
 export const getDashboardData = async () => {
     try {
@@ -265,5 +274,61 @@ export const getUserWatchHistory = async () => {
     }
     catch (err) {
         return { status: 500, message: "Internal Server Error " + err.message };
+    }
+};
+
+export const editUserAvatar = async (currentState, formData) => {
+    try {
+        let userData = await getUserData();
+        if (userData.status !== 200) return { status: userData.status, message: userData.message };
+        let newAvatarURL = formData.get("avatarURL");
+        if (newAvatarURL === null || newAvatarURL.trim() === "") return { status: 400, message: "Bad Request" };
+        await connectDB();
+        if (userData.user.avatar !== "https://res.cloudinary.com/cloudformedia/image/upload/chirp-play/avatar-default.jpg") {
+            Cloudinary.api.delete_resources(["chirp-play/" + userData.user.avatar.split("/").pop().split(".")[0]], { resource_type: "image" }, (error) => {
+                if (error) return { status: 500, message: "Internal Server Error" };
+            });
+        }
+        await User.updateOne({ email: userData.user.email }, { avatar: newAvatarURL });
+        revalidatePath(`/user/${userData.user._id}`);
+        return { status: 200, message: "Avatar updated Successfully 😊" };
+    }
+    catch (err) {
+        return { status: 500, message: "Internal Server Error " + err.message };
+    }
+};
+
+export const editUserCover = async (currentState, formData) => {
+    try {
+        let userData = await getUserData();
+        if (userData.status !== 200) return { status: userData.status, message: userData.message };
+        let newCoverImageURL = formData.get("coverImageURL");
+        if (newCoverImageURL === null || newCoverImageURL.trim() === "") return { status: 400, message: "Bad Request" };
+        await connectDB();
+        if (userData.user.coverImage !== "https://res.cloudinary.com/cloudformedia/image/upload/chirp-play/coverimage-default.png") {
+            Cloudinary.api.delete_resources(["chirp-play/" + userData.user.coverImage.split("/").pop().split(".")[0]], { resource_type: "image" }, (error) => {
+                if (error) return { status: 500, message: "Internal Server Error" };
+            });
+        }
+        await User.updateOne({ email: userData.user.email }, { coverImage: newCoverImageURL });
+        revalidatePath(`/user/${userData.user._id}`);
+        return { status: 200, message: "Cover Image updated Successfully 😊" };
+    }
+    catch (err) {
+        return { status: 500, message: "Internal Server Error " + err.message };
+    }
+};
+
+export const deleteAvatarCoverModalClosed = async (coverURL) => {
+    try {
+        if (coverURL) {
+            Cloudinary.api.delete_resources(["chirp-play/" + coverURL.split("/").pop().split(".")[0]], { resource_type: "image" }, (error) => {
+                if (error) return { status: 500, message: "Internal Server Error" };
+            });
+        }
+        return { status: 200, message: "Cancelled Successfully" };
+    }
+    catch (error) {
+        return { status: 500, message: "Internal Server Error " + error.message };
     }
 };

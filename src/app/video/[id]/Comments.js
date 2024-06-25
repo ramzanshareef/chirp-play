@@ -197,7 +197,7 @@ const EditCommentModal = ({ isOpen, onClose, commentToEdit }) => {
         else if (state?.status !== 200 && state?.message) {
             toast.error(state.message);
         }
-    }, [state]);
+    }, [state, onClose]);
 
     return (
         <>

@@ -121,7 +121,7 @@ const Header = ({ userData }) => {
                         ref={trigger}
                         onClick={() => setDropdownOpen(!dropdownOpen)}
                     />
-                    <Link className="border border-gray-400 text-blue-600 hover:bg-blue-200 flex rounded-full px-2 py-1 max-sm:p-2 gap-x-2"
+                    <Link className="border border-gray-400 text-blue-600 hover:bg-blue-200 flex rounded-full px-2 py-1 max-sm:p-0.5 gap-x-2"
                         href={userData.user ? "/user/" + userData?.user._id : "/login"}
                     >
                         {userData.user ? <div className="flex gap-2">

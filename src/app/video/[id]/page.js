@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { VideoComp, VideoPlayer } from "@/components/Video";
+import { VideoComp, VideoPlayer } from "@/components/video/Video";
 import { getUserData } from "@root/actions/user/data";
 import { getVideoData, suggestedVideos } from "@root/actions/video";
 import moment from "moment";
@@ -11,11 +11,14 @@ import { LikeButton } from "./ClientComponents";
 import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import Link from "next/link";
 import { isAuthenticated } from "@root/utils/session";
+import { notFound } from "next/navigation";
 
 export default async function VideoPage({ params }) {
     const isAuth = await isAuthenticated();
     const userDetails = await getUserData();
-    const { video } = await getVideoData(params.id);
+    const videoData = await getVideoData(params.id);
+    if (videoData.video.length === 0) notFound();
+    const video = videoData?.video[0];
     const suggestedVideosData = await suggestedVideos(params.id);
     return (
         <>

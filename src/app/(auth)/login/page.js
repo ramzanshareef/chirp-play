@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import LoginForm from "./LoginForm";
+import Loader from "@/components/loader";
 
 export default async function LoginPage({ searchParams }) {
     return <>
-        <Suspense>
-            <LoginForm 
+        <Suspense fallback={<Loader />} >
+            <LoginForm
                 searchParams={searchParams}
             />
         </Suspense>
@@ -12,6 +13,6 @@ export default async function LoginPage({ searchParams }) {
 }
 
 export const metadata = {
-    title: "Chirp Play - Login",
+    title: "Login",
     description: "Login to your account",
 };

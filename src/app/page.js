@@ -1,4 +1,4 @@
-import { VideoComp } from "@/components/Video";
+import { VideoComp } from "@/components/video/Video";
 import { getAllVideos } from "@root/actions/video";
 
 export default async function Home() {

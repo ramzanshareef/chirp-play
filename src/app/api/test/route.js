@@ -1,159 +1,54 @@
 import connectDB from "@root/actions/db/connectDB";
-// import { getUserData } from "@root/actions/user/data";
+import Like from "@root/models/Like";
+import User from "@root/models/User";
 import Video from "@root/models/Video";
 import mongoose from "mongoose";
 
 export async function GET() {
     try {
         await connectDB();
-        // const loggedUserData = await getUserData();
-        // const currUser = await loggedUserData?.user?.id; // Get current user id
-        // using a static user id for testing
-        const currUser = new mongoose.Types.ObjectId("6673931a872ab72a664f724a");
-        const data = await Video.aggregate([
+        let currUser = "6673931a872ab72a664f724a";
+        const data = await User.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId("667268bbc765fa4a4732ac90")
+                    _id: new mongoose.Types.ObjectId(currUser)
                 }
             },
             {
                 $lookup: {
-                    from: "users",
-                    localField: "owner",
+                    from: "videos",
+                    localField: "watchHistory",
                     foreignField: "_id",
-                    as: "owner",
-                    pipeline: [
-                        {
-                            $lookup: {
-                                from: "subscriptions",
-                                localField: "_id",
-                                foreignField: "channel",
-                                as: "subscribers",
-                            }
-                        },
-                        {
-                            $addFields: {
-                                totalSubscribers: {
-                                    $size: {
-                                        $ifNull: ["$subscribers", []]
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            $addFields: {
-                                isSub: {
-                                    $in: [currUser, "$subscribers.subscriber"]
-                                }
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                $addFields: {
-                    isSub: {
-                        $arrayElemAt: ["$owner.isSub", 0]
-                    },
-                }
-            },
-            {
-                $addFields: {
-                    owner: {
-                        $arrayElemAt: ["$owner", 0]
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: "likes",
-                    localField: "_id",
-                    foreignField: "contentID",
-                    as: "likes",
-                }
-            },
-            {
-                $addFields: {
-                    totalLikes: {
-                        $size: {
-                            $ifNull: ["$likes", []]
-                        }
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    isLikedByCurrUser: {
-                        $in: [currUser, "$likes.likedBy"]
-                    }
-                }
-            },
-            {
-                $lookup: {
-                    from: "comments",
-                    localField: "_id",
-                    foreignField: "video",
-                    as: "comments",
+                    as: "watchHistory",
                     pipeline: [
                         {
                             $lookup: {
                                 from: "users",
                                 localField: "owner",
                                 foreignField: "_id",
-                                as: "owner",
-                                pipeline: [
-                                    {
-                                        $project: {
-                                            _id: 1,
-                                            name: 1,
-                                            username: 1,
-                                            avatar: 1
-                                        }
-                                    }
-                                ]
+                                as: "owner"
                             }
                         },
                         {
                             $addFields: {
-                                isCurrUserOwnerOfComment: {
-                                    $in: [currUser, "$owner._id"]
-                                }
-                            }
-                        },
-                        {
-                            $lookup: {
-                                from: "likes",
-                                localField: "_id",
-                                foreignField: "contentID",
-                                as: "likes",
-                            }
-                        },
-                        {
-                            $addFields: {
-                                totalLikes: {
-                                    $size: {
-                                        $ifNull: ["$likes", []]
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            $addFields: {
-                                isLikedByCurrUser: {
-                                    $in: [currUser, "$likes.likedBy"]
+                                owner: {
+                                    $arrayElemAt: ["$owner", 0]
                                 }
                             }
                         },
                         {
                             $project: {
-                                owner: {
-                                    $arrayElemAt: ["$owner", 0]
-                                },
-                                content: 1,
+                                title: 1,
+                                description: 1,
+                                thumbnail: 1,
+                                views: 1,
+                                duration: 1,
                                 createdAt: 1,
-                                isCurrUserOwnerOfComment: 1,
-                                totalLikes: 1,
-                                isLikedByCurrUser: 1
+                                owner: {
+                                    name: 1,
+                                    avatar: 1
+                                }
+                            
                             }
                         }
                     ]
@@ -161,22 +56,7 @@ export async function GET() {
             },
             {
                 $project: {
-                    _id: 0,
-                    title: 1,
-                    description: 1,
-                    views: 1,
-                    duration: 1,
-                    createdAt: 1,
-                    owner: {
-                        _id: 1,
-                        name: 1,
-                        avatar: 1,
-                        totalSubscribers: 1
-                    },
-                    isSub: 1,
-                    totalLikes: 1,
-                    isLikedByCurrUser: 1,
-                    comments: 1
+                    watchHistory: 1
                 }
             }
         ]);

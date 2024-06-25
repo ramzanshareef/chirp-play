@@ -11,9 +11,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useActionState, useOptimistic, useState } from "react";
 import { FiTwitter } from "react-icons/fi";
-import { FaUserPlus, FaUserCheck } from "react-icons/fa";
+import { FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { FcLike } from "react-icons/fc";
 import { addChirp, likeChirpHandler } from "@root/actions/chirp";
@@ -279,7 +279,7 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
 
 const SubrscribedContent = ({ userDetails }) => {
     const [searchQuery, setSearchQuery] = useState("");
-    if (!userDetails.isCurrentUser) return null;
+    if (!userDetails.isCurrentUser) redirect("/");
 
     const filteredSubscriptions = userDetails?.user[0]?.subscribedByUser?.filter(sub => {
         return sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || sub.username.toLowerCase().includes(searchQuery.toLowerCase());

@@ -9,6 +9,6 @@ export default async function SignupPage() {
 }
 
 export const metadata = {
-    title: "Chirp Play - Signup",
+    title: "Signup",
     description: "Create your account",
 };

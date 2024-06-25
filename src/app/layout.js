@@ -7,12 +7,15 @@ import { getUserData } from "@root/actions/user/data";
 import { Suspense } from "react";
 import NextTopLoader from "nextjs-toploader";
 import Footer from "./_home/Footer";
+import Loader from "@/components/loader";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-    title: "Chirp Play",
-    description: "Web app for creating and sharing your chirps and videos.",
+    title: {
+        template: "%s | Chirp Play",
+        default: "Chirp Play",
+    },
 };
 
 export default async function RootLayout({ children }) {
@@ -41,17 +44,17 @@ export default async function RootLayout({ children }) {
                         newestOnTop={true}
                         className="z-max"
                     />
-                    <Suspense>
+                    <Suspense fallback={<Loader />} >
                         <SidebarWithSuspense />
                     </Suspense>
                     <div className="w-full flex flex-col">
-                        <Suspense>
+                        <Suspense fallback={<Loader />} >
                             <HeaderWithSuspense />
                         </Suspense>
                         <div className="px-4 py-2 pb-20 sm:py-5 sm:px-20 overflow-y-scroll scrollbar-hide">
                             {children}
                         </div>
-                        <Suspense>
+                        <Suspense fallback={<Loader />} >
                             <FooterWithSuspense />
                         </Suspense>
                     </div>

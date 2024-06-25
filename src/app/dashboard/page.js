@@ -68,6 +68,6 @@ export default async function DashboardPage() {
 }
 
 export const metadata = {
-    title: "Dashboard | ChirpPlay",
+    title: "Dashboard",
     description: "Dashboard page to manage videos",
 };

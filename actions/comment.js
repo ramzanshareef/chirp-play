@@ -81,3 +81,28 @@ export async function deleteComment(commentID) {
         return { status: 500, message: "Internal Server Error " + error.message };
     }
 }
+
+export async function editComment(currentState, formData) {
+    try {
+        await connectDB();
+        let userData = await getUserData();
+        if (userData.status !== 200) {
+            return { status: 401, message: "Please Login to edit a Comment" };
+        }
+        let commentID = formData.get("commentID");
+        let comment = await Comment.findById(commentID).populate("owner").select("-password");
+        if (!comment) {
+            return { status: 404, message: "Comment not found" };
+        }
+        if (comment.owner._id.toString() !== userData.user._id.toString()) {
+            return { status: 403, message: "Not Authorized" };
+        }
+        let content = formData.get("comment");
+        await Comment.findByIdAndUpdate(commentID, { content });
+        revalidatePath(`/video/${comment.video}`);
+        return { status: 200, message: "Comment Edited Successfully" };
+    }
+    catch (error) {
+        return { status: 500, message: "Internal Server Error " + error.message };
+    }
+}

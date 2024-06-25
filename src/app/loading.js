@@ -1,7 +1,7 @@
 "use client";
 
+import Loader from "@/components/loader";
 import { usePathname } from "next/navigation";
-import { FaSpinner } from "react-icons/fa";
 
 export default function Loading() {
     const pathname = usePathname();
@@ -10,7 +10,7 @@ export default function Loading() {
             {pathname === "/" ?
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {[...Array(12)].map((_, index) => (
-                        <div key={index} className="w-80 rounded overflow-hidden shadow-lg animate-pulse">
+                        <div key={index} className="rounded overflow-hidden shadow-lg animate-pulse">
                             <div className="relative">
                                 <div className="w-full h-48 bg-gray-300"></div>
                                 <div className="absolute bottom-2 right-2 bg-gray-400 text-white text-xs px-2 py-1 rounded"></div>
@@ -29,9 +29,7 @@ export default function Loading() {
                     ))}
                 </div>
                 :
-                <div className="flex justify-center items-center h-screen">
-                    <FaSpinner className="animate-spin text-2xl" />
-                </div>
+                <Loader />
             }
         </>
     );

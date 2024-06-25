@@ -4,11 +4,14 @@ import { ContentBox } from "./ClientComponents";
 import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import { Suspense } from "react";
 import moment from "moment";
+import { notFound } from "next/navigation";
+import Loader from "@/components/loader";
 
 export default async function UserPage({ params, searchParams }) {
     const userDetails = await getAUserData(params?.userID);
-    return <>
-        <Suspense>
+    if (userDetails.user.length === 0) notFound();
+    return (<>
+        <Suspense fallback={<Loader />}>
             <div
                 className="relative h-40 w-full bg-cover bg-center"
                 style={{ backgroundImage: `url(${userDetails?.user[0]?.coverImage})` }}
@@ -45,5 +48,13 @@ export default async function UserPage({ params, searchParams }) {
                 isCurrentUser={userDetails?.isCurrentUser}
             />
         </Suspense>
-    </>;
+    </>);
+}
+
+export async function generateMetadata({ params }) {
+    const userDetails = await getAUserData(params?.userID);
+    return {
+        title: userDetails?.user[0]?.name || "😞 User Not Found",
+        description: userDetails?.user[0]?.name + " is a user on our platform" || "Sorry, we couldn't find the user you're looking for",
+    };
 }

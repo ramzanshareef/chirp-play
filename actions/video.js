@@ -233,7 +233,7 @@ export const getVideoData = async (videoId) => {
         ]);
         return {
             status: 200,
-            video: JSON.parse(JSON.stringify(videoData[0])),
+            video: JSON.parse(JSON.stringify(videoData)),
         };
     }
     catch (error) {

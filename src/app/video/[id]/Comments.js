@@ -1,7 +1,7 @@
 "use client";
 
 import { SubmitButton } from "@/components/buttons/SubmitButton";
-import { addComment, deleteComment, likeCommentHandler } from "@root/actions/comment";
+import { addComment, deleteComment, editComment, likeCommentHandler } from "@root/actions/comment";
 import moment from "moment";
 import Image from "next/image";
 import { useState, useEffect, useActionState } from "react";
@@ -17,6 +17,8 @@ export const Comments = ({ comments }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState({});
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [commentToEdit, setCommentToEdit] = useState({});
 
     useEffect(() => {
         const handleResize = () => {
@@ -60,7 +62,7 @@ export const Comments = ({ comments }) => {
                                 <span className="font-bold">{comment.owner.name}</span>
                                 <div className="text-gray-600 text-xs ml-2">{moment(comment.createdAt).fromNow()}</div>
                             </div>
-                            <div className={`items-center gap-x-2  ${comment?.isCurrUserOwnerOfComment ? "flex" : "hidden"} `}>
+                            {comment.isCurrUserOwnerOfComment && <div className="flex items-center gap-x-2">
                                 <MdDelete
                                     size={20}
                                     className="text-gray-400 hover:text-gray-600 cursor-pointer"
@@ -73,8 +75,14 @@ export const Comments = ({ comments }) => {
                                 <TbEdit
                                     size={20}
                                     className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setCommentToEdit(comment);
+                                        setShowEditModal(true);
+                                    }}
                                 />
                             </div>
+                            }
                         </div>
                         <Link
                             href={`/user/${comment?.owner?._id}`}
@@ -118,11 +126,16 @@ export const Comments = ({ comments }) => {
                 onClose={() => setShowDeleteModal(false)}
                 commentToDelete={commentToDelete}
             />
+            <EditCommentModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                commentToEdit={commentToEdit}
+            />
         </>
     );
 };
 
-export const DeleteCommentConfimationModal = ({ isOpen, onClose, commentToDelete }) => {
+const DeleteCommentConfimationModal = ({ isOpen, onClose, commentToDelete }) => {
     return (
         <>
             {(isOpen === true)
@@ -172,6 +185,68 @@ export const DeleteCommentConfimationModal = ({ isOpen, onClose, commentToDelete
                                 >
                                     No
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+                :
+                <></>
+            }
+        </>
+    );
+};
+
+const EditCommentModal = ({ isOpen, onClose, commentToEdit }) => {
+    const [state, formAction] = useActionState(editComment, null);
+
+    useEffect(() => {
+        if (state?.status === 200) {
+            toast.success(state.message, {
+                onClick: () => onClose(),
+                onClose: () => onClose()
+            });
+        }
+        else if (state?.status !== 200 && state?.message) {
+            toast.error(state.message);
+        }
+    }, [state]);
+
+    return (
+        <>
+            {(isOpen === true)
+                ?
+                <>
+                    <div className="fixed z-50 inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+                        <div className="w-4/5 lg:w-2/5 mx-auto p-6 bg-white shadow-md rounded-xl overflow-y-auto max-h-screen">
+                            <h2 className="text-2xl font-semibold mb-4">
+                                Edit Comment
+                                <IoIosCloseCircleOutline
+                                    onClick={onClose}
+                                    className="cursor-pointer float-right"
+                                />
+                            </h2>
+                            <div>
+                                <form action={formAction} className="w-full">
+                                    <textarea
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent"
+                                        placeholder="Edit your comment..."
+                                        name="comment"
+                                        required
+                                        minLength={5}
+                                        defaultValue={commentToEdit.content}
+                                    />
+                                    <input type="hidden" name="commentID" value={commentToEdit._id} />
+                                    <SubmitButton
+                                        title={
+                                            <>
+                                                <MdOutlineInsertComment size={20} className="mr-2 sm:hidden" />
+                                                <span className="max-sm:hidden">Save</span>
+                                            </>
+                                        }
+                                        size="fit"
+                                        className="ml-auto mt-2"
+                                    />
+                                </form>
                             </div>
                         </div>
                     </div>

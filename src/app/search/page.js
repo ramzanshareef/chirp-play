@@ -1,11 +1,12 @@
 import { searchVideos } from "@root/actions/video";
 import { Suspense } from "react";
-import { VideoCard } from "./VideoCard";
+import { VideoCard } from "../../components/video/VideoCard";
+import Loader from "@/components/loader";
 
 export default async function SearchPage({ searchParams }) {
     const searchedData = await searchVideos(searchParams.q);
     return (
-        <Suspense>
+        <Suspense fallback={<Loader />}>
             <div className="flex flex-col -space-y-2">
                 {searchedData?.videos?.map((video, key) => (
                     <VideoCard key={key} video={video} />

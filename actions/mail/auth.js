@@ -16,6 +16,11 @@ export async function sendEmailForOTP(state, formData) {
         if (name === "" || email === "" || password === "" || username === "") {
             return { status: 400, message: "All fields are required" };
         }
+        let allowedEmailDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com"];
+        let emailDomain = email.split("@")[1];
+        if (!allowedEmailDomains.includes(emailDomain)) {
+            return { status: 400, message: "Only Gmail, Yahoo, Hotmail and Outlook domains are allowed" };
+        }
         await connectDB();
         let user = await User.aggregate([
             { $match: { $or: [{ email: email }, { username: username }] } }

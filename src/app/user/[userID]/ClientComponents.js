@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useActionState, useOptimistic, useState } from "react";
 import { FiTwitter } from "react-icons/fi";
-import { FaUserCheck } from "react-icons/fa";
+import { FaCamera, FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { redirect, useRouter } from "next/navigation";
 import { IoIosCloseCircleOutline, IoMdHeartEmpty } from "react-icons/io";
@@ -26,6 +26,31 @@ import { CgPlayList } from "react-icons/cg";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
+
+export const AvatarAndCover = ({ userDetails }) => {
+    return <>
+        <div
+            className="relative h-40 w-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${userDetails?.user[0]?.coverImage})` }}
+        >
+            <div className="absolute bottom-0 left-4 transform translate-y-1/2">
+                <Image
+                    src={userDetails?.user[0]?.avatar}
+                    alt={`${userDetails?.user[0]?.name}'s avatar`}
+                    className="h-24 w-24 rounded-full border-4 border-white"
+                    width={96}
+                    height={96}
+                />
+                <div className="absolute bottom-0 right-0 bg-white rounded-full p-1">
+                    <FaCamera className="text-lg text-gray-600 hover:text-gray-500 hover:cursor-pointer" />
+                </div>
+            </div>
+            <div className="absolute bottom-0 right-0 bg-white rounded-full p-2">
+                <FaCamera className="text-4xl text-gray-600 hover:text-gray-500 hover:cursor-pointer" />
+            </div>
+        </div>
+    </>;
+};
 
 export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) => {
     const router = useRouter();

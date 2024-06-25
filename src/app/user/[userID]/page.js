@@ -1,6 +1,5 @@
 import { getAUserData } from "@root/actions/user/otherUser";
-import Image from "next/image";
-import { ContentBox } from "./ClientComponents";
+import { AvatarAndCover, ContentBox } from "./ClientComponents";
 import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import { Suspense } from "react";
 import moment from "moment";
@@ -12,20 +11,7 @@ export default async function UserPage({ params, searchParams }) {
     if (userDetails.user.length === 0) notFound();
     return (<>
         <Suspense fallback={<Loader />}>
-            <div
-                className="relative h-40 w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${userDetails?.user[0]?.coverImage})` }}
-            >
-                <div className="absolute bottom-0 left-4 transform translate-y-1/2">
-                    <Image
-                        src={userDetails?.user[0]?.avatar}
-                        alt={`${userDetails?.user[0]?.name}'s avatar`}
-                        className="h-24 w-24 rounded-full border-4 border-white"
-                        width={96}
-                        height={96}
-                    />
-                </div>
-            </div>
+            <AvatarAndCover userDetails={userDetails} />
             <div className="mt-12 flex items-center justify-between">
                 <div>
                     <h1 className="text-xl font-bold">{userDetails?.user[0]?.name}</h1>

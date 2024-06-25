@@ -17,6 +17,11 @@ export async function userSignup(currentState, formData) {
     if (name === "" || email === "" || password === "" || username === "" || otp === "") {
         return { status: 400, message: "All fields are required" };
     }
+    let allowedEmailDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com"];
+    let emailDomain = email.split("@")[1];
+    if (!allowedEmailDomains.includes(emailDomain)) {
+        return { status: 400, message: "Only Gmail, Yahoo, Hotmail and Outlook domains are allowed" };
+    }
     else {
         try {
             await connectDB();

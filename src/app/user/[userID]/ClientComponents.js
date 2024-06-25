@@ -216,27 +216,28 @@ const ChirpsContent = ({ userDetails, isCurrentUser }) => {
                                         {moment(chirp.createdAt).fromNow()}
                                     </div>
                                 </div>
-
-                                <div className="flex items-center gap-x-2">
-                                    <MdDelete
-                                        size={20}
-                                        className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            setChirpToDelete(chirp);
-                                            setShowDeleteModal(true);
-                                        }}
-                                    />
-                                    <TbEdit
-                                        size={20}
-                                        className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            setCommentToEdit(chirp);
-                                            setShowEditModal(true);
-                                        }}
-                                    />
-                                </div>
+                                {isCurrentUser &&
+                                    <div className="flex items-center gap-x-2">
+                                        <MdDelete
+                                            size={20}
+                                            className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setChirpToDelete(chirp);
+                                                setShowDeleteModal(true);
+                                            }}
+                                        />
+                                        <TbEdit
+                                            size={20}
+                                            className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setCommentToEdit(chirp);
+                                                setShowEditModal(true);
+                                            }}
+                                        />
+                                    </div>
+                                }
 
                             </div>
                             <p>

@@ -28,7 +28,7 @@ import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
 import { deleteAvatarCoverModalClosed, editUserAvatar, editUserCover } from "@root/actions/user/data";
 import UnderDevelopment from "@/components/UnderDevelopment";
-import { SimpleLoader } from "@/components/loader";
+import Loader from "@/components/loader";
 
 export const AvatarAndCover = ({ userDetails }) => {
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false);
@@ -474,7 +474,7 @@ export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) =>
                 })}
             </div>
             <div className="mt-4">
-                {isPending ? <SimpleLoader /> : renderContent()}
+                {isPending ? <Loader /> : renderContent()}
             </div>
         </div >
     </>;

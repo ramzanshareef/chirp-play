@@ -5,9 +5,10 @@ import Like from "@root/models/Like";
 import { getUserData } from "./user/data";
 import { revalidatePath } from "next/cache";
 
-export async function likeHandler(contentID, contentType) {
+export async function likeHandler(currentState, data) {
     try {
         await connectDB();
+        let { contentID, contentType } = data;
         let userData = await getUserData();
         if (userData.status !== 200) {
             return { status: 401, message: "Please Login to Like" };
@@ -39,4 +40,9 @@ export async function likeHandler(contentID, contentType) {
     catch (error) {
         return { status: 500, message: "Internal Server Error " + error.message };
     }
+}
+
+export async function testAction(prevState, formData) {
+    console.log(prevState, formData);
+    return { status: 200, message: "Test Action" };
 }

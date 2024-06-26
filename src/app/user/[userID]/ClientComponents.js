@@ -9,7 +9,7 @@ import moment from "moment";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useActionState, useOptimistic, useState } from "react";
+import { useEffect, useActionState, useOptimistic, useState, useTransition } from "react";
 import { FiTwitter } from "react-icons/fi";
 import { FaCamera, FaUserCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -28,6 +28,7 @@ import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
 import { TbEdit } from "react-icons/tb";
 import { deleteAvatarCoverModalClosed, editUserAvatar, editUserCover } from "@root/actions/user/data";
 import UnderDevelopment from "@/components/UnderDevelopment";
+import { SimpleLoader } from "@/components/loader";
 
 export const AvatarAndCover = ({ userDetails }) => {
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false);
@@ -412,6 +413,7 @@ export const EditCoverModal = ({ isOpen, onClose }) => {
 
 export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) => {
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     const renderContent = () => {
         switch (activeTab) {
@@ -458,7 +460,9 @@ export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) =>
                         className={`py-2 px-4 flex items-center justify-center overflow-x-scroll scrollbar-hide text-wrap ${activeTab === tab ? "border-b-4 border-b-indigo-600 text-indigo-600 bg-gray-200 rounded-t-lg" : "text-gray-600 hover:border-b-4 hover:border-b-indigo-600 hover:text-indigo-600 hover:bg-gray-200 hover:rounded-t-lg"}`}
                         onClick={(e) => {
                             e.preventDefault();
-                            router.push(`/user/${userDetails?.user[0]?._id}?tab=${tab}`);
+                            startTransition(() => {
+                                router.push(`/user/${userDetails?.user[0]?._id}?tab=${tab}`);
+                            });
                         }}
                         style={{
                             width: `${100 / renderTabs.length}%`
@@ -470,7 +474,7 @@ export const ContentBox = ({ userDetails, isAuth, activeTab, isCurrentUser }) =>
                 })}
             </div>
             <div className="mt-4">
-                {renderContent()}
+                {isPending ? <SimpleLoader /> : renderContent()}
             </div>
         </div >
     </>;
@@ -795,6 +799,9 @@ const SubrscribedContent = ({ userDetails }) => {
     const [searchQuery, setSearchQuery] = useState("");
     if (!userDetails.isCurrentUser) redirect("/");
 
+    const [pending, startTransition] = useTransition();
+    const [result, action] = useActionState(subscribeHandlerToUser, null);
+
     const filteredSubscriptions = userDetails?.user[0]?.subscribedByUser?.filter(sub => {
         return sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || sub.username.toLowerCase().includes(searchQuery.toLowerCase());
     });
@@ -840,12 +847,14 @@ const SubrscribedContent = ({ userDetails }) => {
                 <div className="ml-auto">
                     <button
                         className="flex items-center gap-2 rounded-md py-2 px-4 text-white hover:bg-red-700 bg-red-600"
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            let res = await subscribeHandlerToUser(sub._id, "/" + userDetails.user[0]._id);
-                            if (res.status !== 200) {
-                                toast.error(res.message);
-                            }
+                        onClick={async () => {
+                            startTransition(async () => {
+                                let pathToRevalidate = `/user/${userDetails?.user[0]?._id}?tab=subscribed`;
+                                await action({
+                                    userID: sub._id,
+                                    pathToRevalidate: pathToRevalidate,
+                                });
+                            });
                         }}
                     >
                         <FaUserCheck size={20} />

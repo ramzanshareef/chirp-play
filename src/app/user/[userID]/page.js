@@ -4,13 +4,21 @@ import { SubscribeButton } from "@/components/buttons/SubscribeButton";
 import { Suspense } from "react";
 import moment from "moment";
 import { notFound } from "next/navigation";
-import Loader from "@/components/loader";
+import Loading from "./loading";
 
 export default async function UserPage({ params, searchParams }) {
+    return (<>
+        <Suspense fallback={<Loading />}>
+            <UserPageWithSuspense params={params} searchParams={searchParams} />
+        </Suspense>
+    </>);
+}
+
+async function UserPageWithSuspense({ params, searchParams }) {
     const userDetails = await getAUserData(params?.userID);
     if (userDetails.user.length === 0) notFound();
     return (<>
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loading />}>
             <AvatarAndCover userDetails={userDetails} />
             <div className="mt-12 flex items-center justify-between">
                 <div>

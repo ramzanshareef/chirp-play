@@ -4,7 +4,7 @@ import { SubmitButton } from "@/components/buttons/SubmitButton";
 import { addComment, deleteComment, editComment, likeCommentHandler } from "@root/actions/comment";
 import moment from "moment";
 import Image from "next/image";
-import { useState, useEffect, useActionState } from "react";
+import { useState, useEffect, useActionState, useTransition, useOptimistic } from "react";
 import { TbEdit } from "react-icons/tb";
 import { MdDelete, MdOutlineInsertComment } from "react-icons/md";
 import { toast } from "react-toastify";
@@ -12,13 +12,28 @@ import Link from "next/link";
 import { IoIosCloseCircleOutline, IoMdHeartEmpty } from "react-icons/io";
 import { FcLike } from "react-icons/fc";
 
-export const Comments = ({ comments }) => {
+export const Comments = ({ isAuth, videoID, comments, userDetails }) => {
     const [showComments, setShowComments] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState({});
     const [showEditModal, setShowEditModal] = useState(false);
     const [commentToEdit, setCommentToEdit] = useState({});
+
+    // eslint-disable-next-line no-unused-vars
+    const [pending, startTransition] = useTransition();
+    const [state, action] = useActionState(addComment, null);
+
+    const [optimisticComments, setOptimisticComments] = useOptimistic(comments);
+
+    useEffect(() => {
+        if (state?.status === 200) {
+            document.getElementById("commentForm").reset();
+        }
+        if (state?.status !== 200 && state?.message) {
+            toast.error(state.message);
+        }
+    }, [state]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -34,8 +49,81 @@ export const Comments = ({ comments }) => {
         // Cleanup on unmount
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
     return (
         <>
+            {isAuth ?
+                (<div className="flex flex-row gap-x-4">
+                    <Image
+                        src={userDetails?.user?.avatar}
+                        alt={userDetails?.user?.name}
+                        className="w-10 h-10 rounded-full"
+                        width={40}
+                        height={40}
+                    />
+                    <form action={async (formData) => {
+                        startTransition(async () => {
+                            if (isAuth) {
+                                setOptimisticComments([{
+                                    _id: Math.random().toString(36).substring(7),
+                                    content: formData.get("comment"),
+                                    owner: {
+                                        _id: userDetails?.user?._id,
+                                        name: userDetails?.user?.name,
+                                        username: userDetails?.user?.username,
+                                        avatar: userDetails?.user?.avatar,
+                                    },
+                                    createdAt: new Date(),
+                                    isLikedByCurrUser: false,
+                                    totalLikes: 0,
+                                    isCurrUserOwnerOfComment: true,
+                                }, ...optimisticComments]);
+                            }
+                            await action({
+                                videoID,
+                                content: formData.get("comment"),
+                            });
+                        });
+                    }} className="w-full" id="commentForm" >
+                        <div className="flex flex-col w-full">
+                            <textarea
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent"
+                                placeholder="Add a public comment..."
+                                name="comment"
+                                required
+                                minLength={5}
+                            />
+                            <input type="hidden" name="videoID" value={videoID} />
+                            <SubmitButton
+                                title={
+                                    <>
+                                        <MdOutlineInsertComment size={20} className="mr-2 sm:hidden" />
+                                        <span className="max-sm:hidden">Comment</span>
+                                    </>
+                                }
+                                size="fit"
+                                className="ml-auto mt-2"
+                            />
+                        </div>
+                    </form>
+                </div>) : (
+                    <div className="flex flex-row gap-x-4">
+                        <Image
+                            src="https://res.cloudinary.com/cloudformedia/image/upload/chirp-play/avatar-default.jpg"
+                            alt="User Avatar"
+                            className="w-10 h-10 rounded-full"
+                            width={40}
+                            height={40}
+                        />
+                        <div className="flex flex-col w-full">
+                            <textarea
+                                className="w-full p-2 border border-gray-200 rounded-lg disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-600"
+                                placeholder="Sign in to Comment"
+                                disabled
+                            />
+                        </div>
+                    </div>
+                )}
             <h4>
                 {comments.length} Comments
             </h4>
@@ -47,7 +135,7 @@ export const Comments = ({ comments }) => {
                     {showComments ? "Hide" : "Show"} Comments
                 </button>
             )}
-            {(showComments || !isMobile) && comments.map(comment => (
+            {(showComments || !isMobile) && optimisticComments.map(comment => (
                 <div key={comment._id} className="flex flex-row gap-x-4 border-b border-gray-200 pb-4">
                     <Image
                         src={comment.owner.avatar}
@@ -247,40 +335,10 @@ const EditCommentModal = ({ isOpen, onClose, commentToEdit }) => {
 };
 
 export const CommentsForm = ({ videoID }) => {
-    const [state, formAction] = useActionState(addComment, null);
 
-    useEffect(() => {
-        if (state?.status === 200) {
-            document.getElementById("commentForm").reset();
-        }
-        if (state?.status !== 200 && state?.message) {
-            toast.error(state.message);
-        }
-    }, [state]);
 
     return (
         <>
-            <form action={formAction} className="w-full" id="commentForm">
-                <div className="flex flex-col w-full">
-                    <textarea
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent"
-                        placeholder="Add a public comment..."
-                        name="comment"
-                        required
-                        minLength={5}
-                    />
-                    <input type="hidden" name="videoID" value={videoID} />
-                    <SubmitButton
-                        title={
-                            <>
-                                <MdOutlineInsertComment size={20} className="mr-2 sm:hidden" />
-                                <span className="max-sm:hidden">Comment</span>
-                            </>
-                        }
-                        size="fit"
-                        className="ml-auto mt-2"
-                    />
-                </div>
-            </form>
+
         </>);
 };

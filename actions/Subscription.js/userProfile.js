@@ -5,9 +5,10 @@ import connectDB from "../db/connectDB";
 import { getUserData } from "../user/data";
 import { revalidatePath } from "next/cache";
 
-export async function subscribeHandlerToUser(userID, pathToRevalidate) {
+export async function subscribeHandlerToUser(currentState, data) {
     try {
         await connectDB();
+        let { userID, pathToRevalidate } = data;
         let userData = await getUserData();
         if (userData.status !== 200) {
             return { status: 401, message: "Please login to Subscribe" };

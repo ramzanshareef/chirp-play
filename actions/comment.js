@@ -6,11 +6,10 @@ import { getUserData } from "./user/data";
 import { revalidatePath } from "next/cache";
 import Like from "@root/models/Like";
 
-export async function addComment(currentState, formData) {
+export async function addComment(currentState, data) {
     try {
         await connectDB();
-        let videoID = formData.get("videoID");
-        let content = formData.get("comment");
+        let { videoID, content } = data;
         let userData = await getUserData();
         if (userData.status !== 200) {
             return { status: 401, message: "Please Login to comment" };

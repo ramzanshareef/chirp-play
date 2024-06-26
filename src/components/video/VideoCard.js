@@ -49,7 +49,7 @@ export const VideoCard = ({ video }) => {
                             </p>
                         </span>
                     </Link>
-                    <span className="text-gray-700 text-sm hidden sm:block">{video.description}</span>
+                    <span className="text-gray-700 text-sm hidden sm:block">{video.description.slice(0, 180) + (video.description.length > 180 ? "..." : "")}</span>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ export const VideoCard = ({ key, video }) => {
                                 {video.title}
                             </h3>
                             <p className="md:text-lg text-gray-500 text-sm">
-                                {video.description}
+                                {video.description.slice(0, 180) + (video.description.length > 180 ? "..." : "")}
                             </p>
                             <div className="flex justify-between item-center">
                                 <div className="flex justify-center items-center gap-x-1">

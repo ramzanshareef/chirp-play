@@ -78,14 +78,14 @@ export default async function VideoPage({ params }) {
                                 </button>
                             </div>
                         </div>
-                        <div className="text-gray-600 text-sm">{video.description}</div>
+                        <div className="text-gray-600 text-sm prose prose-base md:prose-lg prose-invert w-full max-w-none overflow-scroll scrollbar-hide whitespace-break-spaces">{video.description}</div>
                     </div>
 
                     {/* comments */}
                     <div className="flex flex-col gap-y-4 p-4">
 
                         {/* comment form */}
-                        
+
 
                         {/* Existing Comments */}
                         <Comments

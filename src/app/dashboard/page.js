@@ -56,7 +56,8 @@ export default async function DashboardPage() {
                 <h3 className="mb-4">Your Videos</h3>
                 <div className="flex flex-col gap-y-4">
                     <div className="flex flex-col gap-y-4">
-                        {userData?.videos?.map((video, key) => (
+                        {/* please show latest videos first */}
+                        {userData?.videos?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((video, key) => (
                             <VideoCard key={key} video={video} />
                         ))}
                     </div>

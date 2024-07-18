@@ -92,4 +92,4 @@ yarn run dev
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
-`Mohd Ramzan Shareef` - [@itisRamzan](mailto:mail.ramzanshareef@gmail.com)
+`Mohd Ramzan Shareef` - [@ramzanshareef](mailto:mail.ramzanshareef@gmail.com)

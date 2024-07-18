@@ -11,7 +11,6 @@ Welcome to Chirp Play, a platform where users can share videos and thoughts (chi
   - [Running the Application](#running-the-application)
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ## Introduction
@@ -86,10 +85,18 @@ yarn run dev
 - Start exploring and interacting with videos and chirps.
 
 ## Contributing
-`Contributions are welcome!` Please fork the repository and create a pull request for any enhancements or bug fixes.
 
-## License
-Distributed under the MIT License. See `LICENSE` for more information.
+Contributions are welcome! Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create a new branch (git checkout -b feature/YourFeature)
+3. Commit your changes (git commit -m 'Add some feature')
+4. Push to the branch (git push origin feature/YourFeature)
+5. Open a pull request
 
 ## Contact
-`Mohd Ramzan Shareef` - [@ramzanshareef](mailto:mail.ramzanshareef@gmail.com)
+
+For any inquiries or feedback, please reach out to:
+- **Name**: Mohd Ramzan Shareef
+- **Email**: mail.ramzanshareef@gmail.com
+- **GitHub**: [ramzanshareef](https://github.com/ramzanshareef)

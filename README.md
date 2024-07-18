@@ -1,23 +1,12 @@
-# Chirp Play
+# 📢 Chirp Play
 
 Welcome to Chirp Play, a platform where users can share videos and thoughts (chirps), interact with content, and connect with others.
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running the Application](#running-the-application)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Contact](#contact)
-
-## Introduction
+## ⭐ Introduction
 
 Chirp Play is a Next.js based web application designed to facilitate sharing, interaction, and engagement around videos and user-generated content called "chirps". Users can register, login, upload videos, like, comment, and much more.
 
-## Features
+## 🚀 Features
 
 - **User Authentication:**
   - Register and login securely.
@@ -37,7 +26,7 @@ Chirp Play is a Next.js based web application designed to facilitate sharing, in
   - Comment on videos and chirps.
   - Like comments on videos.
 
-## Getting Started
+## ⬇️ Getting Started
 
 To get a local copy up and running follow these simple steps.
 
@@ -79,12 +68,12 @@ Run the development server:
 yarn run dev
 ```
 
-## Usage
+## 📝 Usage
 - Navigate to http://localhost:3000 in your browser.
 - Register an account or log in if you already have one.
 - Start exploring and interacting with videos and chirps.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps to contribute:
 
@@ -94,7 +83,7 @@ Contributions are welcome! Please follow these steps to contribute:
 4. Push to the branch (git push origin feature/YourFeature)
 5. Open a pull request
 
-## Contact
+## 👉 Contact
 
 For any inquiries or feedback, please reach out to:
 - **Name**: Mohd Ramzan Shareef
